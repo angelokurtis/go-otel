@@ -20,17 +20,17 @@ type Env struct {
 	ExporterOTLPTracesEndpoint  *url.URL `envconfig:"EXPORTER_OTLP_TRACES_ENDPOINT"`
 	ExporterOTLPMetricsEndpoint *url.URL `envconfig:"EXPORTER_OTLP_METRICS_ENDPOINT"`
 
-	ExporterOTLPTimeout        time.Duration `envconfig:"EXPORTER_OTLP_TIMEOUT" default:"10s"`
-	ExporterOTLPTracesTimeout  time.Duration `envconfig:"EXPORTER_OTLP_TRACES_TIMEOUT"`
-	ExporterOTLPMetricsTimeout time.Duration `envconfig:"EXPORTER_OTLP_METRICS_TIMEOUT"`
+	ExporterOTLPTimeout        time.Duration  `envconfig:"EXPORTER_OTLP_TIMEOUT" default:"10s"`
+	ExporterOTLPTracesTimeout  *time.Duration `envconfig:"EXPORTER_OTLP_TRACES_TIMEOUT"`
+	ExporterOTLPMetricsTimeout *time.Duration `envconfig:"EXPORTER_OTLP_METRICS_TIMEOUT"`
 
-	ExporterOTLPProtocol        Protocol        `envconfig:"EXPORTER_OTLP_PROTOCOL" default:"grpc"`
-	ExporterOTLPTracesProtocol  trace.Protocol  `envconfig:"EXPORTER_OTLP_TRACES_PROTOCOL"`
-	ExporterOTLPMetricsProtocol metric.Protocol `envconfig:"EXPORTER_OTLP_METRICS_PROTOCOL"`
+	ExporterOTLPProtocol        Protocol         `envconfig:"EXPORTER_OTLP_PROTOCOL" default:"grpc"`
+	ExporterOTLPTracesProtocol  *trace.Protocol  `envconfig:"EXPORTER_OTLP_TRACES_PROTOCOL"`
+	ExporterOTLPMetricsProtocol *metric.Protocol `envconfig:"EXPORTER_OTLP_METRICS_PROTOCOL"`
 
-	ExporterOTLPCompression        Compression        `envconfig:"EXPORTER_OTLP_COMPRESSION" default:"gzip"`
-	ExporterOTLPTracesCompression  trace.Compression  `envconfig:"EXPORTER_OTLP_TRACES_COMPRESSION"`
-	ExporterOTLPMetricsCompression metric.Compression `envconfig:"EXPORTER_OTLP_METRICS_COMPRESSION"`
+	ExporterOTLPCompression        Compression         `envconfig:"EXPORTER_OTLP_COMPRESSION" default:"gzip"`
+	ExporterOTLPTracesCompression  *trace.Compression  `envconfig:"EXPORTER_OTLP_TRACES_COMPRESSION"`
+	ExporterOTLPMetricsCompression *metric.Compression `envconfig:"EXPORTER_OTLP_METRICS_COMPRESSION"`
 
 	MetricExportInterval time.Duration `envconfig:"METRIC_EXPORT_INTERVAL" default:"60s"`
 

@@ -22,8 +22,8 @@ Then the object should have default values and no errors should occur`, func(t *
 	t.Run(`Given an environment variable has been set with an invalid value
 When a new configuration object is created
 Then an error should be returned`, func(t *testing.T) {
-		// set the environment variables and ensure that the environment variable is cleaned up after the _test
-		envvars := _test.SetEnvironmentVariables(map[string]string{"OTEL_TRACES_SAMPLER_ARG": "abc"})
+		// set the environment variables and ensure that the environment variable is cleaned up after the test
+		envvars := _test.SetEnvironmentVariables(map[string]string{"OTEL_TRACES_SAMPLER_ARG": "example.com"})
 		defer envvars.Unset()
 
 		cfg, err := config.NewFromEnv()
