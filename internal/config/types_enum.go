@@ -51,10 +51,10 @@ func ParseCompression(name string) (Compression, error) {
 }
 
 const (
-	// ProtocolGRPC is a Protocol of type gRPC.
-	ProtocolGRPC Protocol = "gRPC"
-	// ProtocolHTTPProtobuf is a Protocol of type HTTP/protobuf.
-	ProtocolHTTPProtobuf Protocol = "HTTP/protobuf"
+	// ProtocolGrpc is a Protocol of type grpc.
+	ProtocolGrpc Protocol = "grpc"
+	// ProtocolHttpProtobuf is a Protocol of type http/protobuf.
+	ProtocolHttpProtobuf Protocol = "http/protobuf"
 )
 
 var ErrInvalidProtocol = errors.New("not a valid Protocol")
@@ -72,10 +72,8 @@ func (x Protocol) IsValid() bool {
 }
 
 var _ProtocolValue = map[string]Protocol{
-	"gRPC":          ProtocolGRPC,
-	"grpc":          ProtocolGRPC,
-	"HTTP/protobuf": ProtocolHTTPProtobuf,
-	"http/protobuf": ProtocolHTTPProtobuf,
+	"grpc":          ProtocolGrpc,
+	"http/protobuf": ProtocolHttpProtobuf,
 }
 
 // ParseProtocol attempts to convert a string to a Protocol.

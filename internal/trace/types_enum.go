@@ -53,8 +53,8 @@ func ParseCompression(name string) (Compression, error) {
 const (
 	// ExporterZipkin is a Exporter of type zipkin.
 	ExporterZipkin Exporter = "zipkin"
-	// ExporterOTLP is a Exporter of type OTLP.
-	ExporterOTLP Exporter = "OTLP"
+	// ExporterOtlp is a Exporter of type otlp.
+	ExporterOtlp Exporter = "otlp"
 	// ExporterNone is a Exporter of type none.
 	ExporterNone Exporter = "none"
 	// ExporterJaeger is a Exporter of type jaeger.
@@ -79,8 +79,7 @@ func (x Exporter) IsValid() bool {
 
 var _ExporterValue = map[string]Exporter{
 	"zipkin":  ExporterZipkin,
-	"OTLP":    ExporterOTLP,
-	"otlp":    ExporterOTLP,
+	"otlp":    ExporterOtlp,
 	"none":    ExporterNone,
 	"jaeger":  ExporterJaeger,
 	"logging": ExporterLogging,
@@ -99,18 +98,18 @@ func ParseExporter(name string) (Exporter, error) {
 }
 
 const (
-	// PropagatorTraceContext is a Propagator of type TraceContext.
-	PropagatorTraceContext Propagator = "TraceContext"
-	// PropagatorBaggage is a Propagator of type Baggage.
-	PropagatorBaggage Propagator = "Baggage"
-	// PropagatorB3 is a Propagator of type B3.
-	PropagatorB3 Propagator = "B3"
-	// PropagatorJaeger is a Propagator of type Jaeger.
-	PropagatorJaeger Propagator = "Jaeger"
-	// PropagatorXRay is a Propagator of type XRay.
-	PropagatorXRay Propagator = "XRay"
-	// PropagatorOTTrace is a Propagator of type OTTrace.
-	PropagatorOTTrace Propagator = "OTTrace"
+	// PropagatorTracecontext is a Propagator of type tracecontext.
+	PropagatorTracecontext Propagator = "tracecontext"
+	// PropagatorBaggage is a Propagator of type baggage.
+	PropagatorBaggage Propagator = "baggage"
+	// PropagatorB3 is a Propagator of type b3.
+	PropagatorB3 Propagator = "b3"
+	// PropagatorJaeger is a Propagator of type jaeger.
+	PropagatorJaeger Propagator = "jaeger"
+	// PropagatorXray is a Propagator of type xray.
+	PropagatorXray Propagator = "xray"
+	// PropagatorOttrace is a Propagator of type ottrace.
+	PropagatorOttrace Propagator = "ottrace"
 )
 
 var ErrInvalidPropagator = errors.New("not a valid Propagator")
@@ -128,18 +127,12 @@ func (x Propagator) IsValid() bool {
 }
 
 var _PropagatorValue = map[string]Propagator{
-	"TraceContext": PropagatorTraceContext,
-	"tracecontext": PropagatorTraceContext,
-	"Baggage":      PropagatorBaggage,
+	"tracecontext": PropagatorTracecontext,
 	"baggage":      PropagatorBaggage,
-	"B3":           PropagatorB3,
 	"b3":           PropagatorB3,
-	"Jaeger":       PropagatorJaeger,
 	"jaeger":       PropagatorJaeger,
-	"XRay":         PropagatorXRay,
-	"xray":         PropagatorXRay,
-	"OTTrace":      PropagatorOTTrace,
-	"ottrace":      PropagatorOTTrace,
+	"xray":         PropagatorXray,
+	"ottrace":      PropagatorOttrace,
 }
 
 // ParsePropagator attempts to convert a string to a Propagator.
@@ -155,10 +148,10 @@ func ParsePropagator(name string) (Propagator, error) {
 }
 
 const (
-	// ProtocolGRPC is a Protocol of type gRPC.
-	ProtocolGRPC Protocol = "gRPC"
-	// ProtocolHTTPProtobuf is a Protocol of type HTTP/protobuf.
-	ProtocolHTTPProtobuf Protocol = "HTTP/protobuf"
+	// ProtocolGrpc is a Protocol of type grpc.
+	ProtocolGrpc Protocol = "grpc"
+	// ProtocolHttpProtobuf is a Protocol of type http/protobuf.
+	ProtocolHttpProtobuf Protocol = "http/protobuf"
 )
 
 var ErrInvalidProtocol = errors.New("not a valid Protocol")
@@ -176,10 +169,8 @@ func (x Protocol) IsValid() bool {
 }
 
 var _ProtocolValue = map[string]Protocol{
-	"gRPC":          ProtocolGRPC,
-	"grpc":          ProtocolGRPC,
-	"HTTP/protobuf": ProtocolHTTPProtobuf,
-	"http/protobuf": ProtocolHTTPProtobuf,
+	"grpc":          ProtocolGrpc,
+	"http/protobuf": ProtocolHttpProtobuf,
 }
 
 // ParseProtocol attempts to convert a string to a Protocol.
@@ -199,14 +190,14 @@ const (
 	SamplerAlwaysOn Sampler = "always_on"
 	// SamplerAlwaysOff is a Sampler of type always_off.
 	SamplerAlwaysOff Sampler = "always_off"
-	// SamplerTraceIDRatio is a Sampler of type traceIDRatio.
-	SamplerTraceIDRatio Sampler = "traceIDRatio"
-	// SamplerParentBasedAlwaysOn is a Sampler of type parentBased_always_on.
-	SamplerParentBasedAlwaysOn Sampler = "parentBased_always_on"
+	// SamplerTraceidratio is a Sampler of type traceidratio.
+	SamplerTraceidratio Sampler = "traceidratio"
+	// SamplerParentbasedAlwaysOn is a Sampler of type parentbased_always_on.
+	SamplerParentbasedAlwaysOn Sampler = "parentbased_always_on"
 	// SamplerParentbasedAlwaysOff is a Sampler of type parentbased_always_off.
 	SamplerParentbasedAlwaysOff Sampler = "parentbased_always_off"
-	// SamplerParentBasedTraceIDRatio is a Sampler of type parentBased_traceIDRatio.
-	SamplerParentBasedTraceIDRatio Sampler = "parentBased_traceIDRatio"
+	// SamplerParentbasedTraceidratio is a Sampler of type parentbased_traceidratio.
+	SamplerParentbasedTraceidratio Sampler = "parentbased_traceidratio"
 )
 
 var ErrInvalidSampler = errors.New("not a valid Sampler")
@@ -226,13 +217,10 @@ func (x Sampler) IsValid() bool {
 var _SamplerValue = map[string]Sampler{
 	"always_on":                SamplerAlwaysOn,
 	"always_off":               SamplerAlwaysOff,
-	"traceIDRatio":             SamplerTraceIDRatio,
-	"traceidratio":             SamplerTraceIDRatio,
-	"parentBased_always_on":    SamplerParentBasedAlwaysOn,
-	"parentbased_always_on":    SamplerParentBasedAlwaysOn,
+	"traceidratio":             SamplerTraceidratio,
+	"parentbased_always_on":    SamplerParentbasedAlwaysOn,
 	"parentbased_always_off":   SamplerParentbasedAlwaysOff,
-	"parentBased_traceIDRatio": SamplerParentBasedTraceIDRatio,
-	"parentbased_traceidratio": SamplerParentBasedTraceIDRatio,
+	"parentbased_traceidratio": SamplerParentbasedTraceidratio,
 }
 
 // ParseSampler attempts to convert a string to a Sampler.

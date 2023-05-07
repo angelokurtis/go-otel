@@ -51,8 +51,8 @@ func ParseCompression(name string) (Compression, error) {
 }
 
 const (
-	// ExporterOTLP is a Exporter of type OTLP.
-	ExporterOTLP Exporter = "OTLP"
+	// ExporterOtlp is a Exporter of type otlp.
+	ExporterOtlp Exporter = "otlp"
 	// ExporterNone is a Exporter of type none.
 	ExporterNone Exporter = "none"
 	// ExporterPrometheus is a Exporter of type prometheus.
@@ -76,8 +76,7 @@ func (x Exporter) IsValid() bool {
 }
 
 var _ExporterValue = map[string]Exporter{
-	"OTLP":       ExporterOTLP,
-	"otlp":       ExporterOTLP,
+	"otlp":       ExporterOtlp,
 	"none":       ExporterNone,
 	"prometheus": ExporterPrometheus,
 	"logging":    ExporterLogging,
@@ -96,10 +95,10 @@ func ParseExporter(name string) (Exporter, error) {
 }
 
 const (
-	// ProtocolGRPC is a Protocol of type gRPC.
-	ProtocolGRPC Protocol = "gRPC"
-	// ProtocolHTTPProtobuf is a Protocol of type HTTP/protobuf.
-	ProtocolHTTPProtobuf Protocol = "HTTP/protobuf"
+	// ProtocolGRpc is a Protocol of type g rpc.
+	ProtocolGRpc Protocol = "g rpc"
+	// ProtocolHttpProtobuf is a Protocol of type http/protobuf.
+	ProtocolHttpProtobuf Protocol = "http/protobuf"
 )
 
 var ErrInvalidProtocol = errors.New("not a valid Protocol")
@@ -117,10 +116,8 @@ func (x Protocol) IsValid() bool {
 }
 
 var _ProtocolValue = map[string]Protocol{
-	"gRPC":          ProtocolGRPC,
-	"grpc":          ProtocolGRPC,
-	"HTTP/protobuf": ProtocolHTTPProtobuf,
-	"http/protobuf": ProtocolHTTPProtobuf,
+	"g rpc":         ProtocolGRpc,
+	"http/protobuf": ProtocolHttpProtobuf,
 }
 
 // ParseProtocol attempts to convert a string to a Protocol.

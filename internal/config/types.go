@@ -7,5 +7,5 @@ package config
 type Compression string
 
 // Protocol defines the encoding of telemetry data and the protocol used to exchange data between the client and the server.
-// ENUM(gRPC, HTTP/protobuf)
+// ENUM(grpc, http/protobuf)
 type Protocol string
