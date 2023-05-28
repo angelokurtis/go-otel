@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
 
-func NewTracerProvider(res *resource.Resource, sampler trace.Sampler, exporters []trace.SpanExporter, config Config) *trace.TracerProvider {
+func NewTracerProvider(res *resource.Resource, sampler trace.Sampler, exporters []trace.SpanExporter, config *Config) *trace.TracerProvider {
 	options := []trace.TracerProviderOption{
 		trace.WithResource(res),
 		trace.WithSampler(sampler),
@@ -21,7 +21,7 @@ func NewTracerProvider(res *resource.Resource, sampler trace.Sampler, exporters 
 	for _, exp := range exporters {
 		options = append(options, trace.WithBatcher(
 			exp,
-			trace.WithBatchTimeout(config.ExporterOTLPTracesTimeout())),
+			trace.WithBatchTimeout(config.Timeout)),
 		)
 	}
 
@@ -31,10 +31,10 @@ func NewTracerProvider(res *resource.Resource, sampler trace.Sampler, exporters 
 	return tp
 }
 
-func NewSpanExporters(ctx context.Context, config Config, client otlptrace.Client) ([]trace.SpanExporter, error) {
+func NewSpanExporters(ctx context.Context, config *Config, client otlptrace.Client) ([]trace.SpanExporter, error) {
 	exporters := make([]trace.SpanExporter, 0)
 
-	for _, expType := range config.TracesExporter() {
+	for _, expType := range config.Exporters {
 		exp, err := newSpanExporter(ctx, expType, client)
 		if err != nil {
 			return nil, err
@@ -46,29 +46,29 @@ func NewSpanExporters(ctx context.Context, config Config, client otlptrace.Clien
 	return exporters, nil
 }
 
-func NewSampler(ctx context.Context, config Config) (trace.Sampler, error) {
-	switch sampler := config.TracesSampler(); sampler {
+func NewSampler(ctx context.Context, config *Config) (trace.Sampler, error) {
+	switch sampler := config.Sampler; sampler {
 	case SamplerAlwaysOn:
 		return trace.AlwaysSample(), nil
 	case SamplerAlwaysOff:
 		return trace.NeverSample(), nil
 	case SamplerTraceidratio:
-		fraction := config.TracesSamplerArg()
+		fraction := config.SamplerArg
 		return trace.TraceIDRatioBased(fraction), nil
 	case SamplerParentbasedAlwaysOn:
 		return trace.ParentBased(trace.AlwaysSample()), nil
 	case SamplerParentbasedAlwaysOff:
 		return trace.ParentBased(trace.NeverSample()), nil
 	case SamplerParentbasedTraceidratio:
-		fraction := config.TracesSamplerArg()
+		fraction := config.SamplerArg
 		return trace.ParentBased(trace.TraceIDRatioBased(fraction)), nil
 	default:
 		return nil, fmt.Errorf("unsupported sampler option: %s", sampler)
 	}
 }
 
-func NewTraceClient(config Config) (otlptrace.Client, error) {
-	switch protocol := config.ExporterOTLPTracesProtocol(); protocol {
+func NewTraceClient(config *Config) (otlptrace.Client, error) {
+	switch protocol := config.Protocol; protocol {
 	case ProtocolGrpc:
 		return newGRPCTraceClient(config)
 	case ProtocolHttpProtobuf:
@@ -94,8 +94,8 @@ func newSpanExporter(ctx context.Context, exporter Exporter, client otlptrace.Cl
 	}
 }
 
-func newGRPCTraceClient(config Config) (otlptrace.Client, error) {
-	endpoint := config.ExporterOTLPTracesEndpoint()
+func newGRPCTraceClient(config *Config) (otlptrace.Client, error) {
+	endpoint := config.Endpoint
 	opts := []otlptracegrpc.Option{otlptracegrpc.WithEndpoint(endpoint.Host)}
 
 	if endpoint.Scheme != "https" {
@@ -105,13 +105,13 @@ func newGRPCTraceClient(config Config) (otlptrace.Client, error) {
 	return otlptracegrpc.NewClient(opts...), nil
 }
 
-func newHTTPTraceClient(config Config) (otlptrace.Client, error) {
+func newHTTPTraceClient(config *Config) (otlptrace.Client, error) {
 	compression, err := newHTTPCompression(config)
 	if err != nil {
 		return nil, err
 	}
 
-	endpoint := config.ExporterOTLPTracesEndpoint()
+	endpoint := config.Endpoint
 	opts := []otlptracehttp.Option{
 		otlptracehttp.WithCompression(compression),
 		otlptracehttp.WithEndpoint(endpoint.Host),
@@ -124,8 +124,8 @@ func newHTTPTraceClient(config Config) (otlptrace.Client, error) {
 	return otlptracehttp.NewClient(opts...), nil
 }
 
-func newHTTPCompression(config Config) (otlptracehttp.Compression, error) {
-	switch compression := config.ExporterOTLPTracesCompression(); compression {
+func newHTTPCompression(config *Config) (otlptracehttp.Compression, error) {
+	switch compression := config.Compression; compression {
 	case CompressionNone:
 		return otlptracehttp.NoCompression, nil
 	case CompressionGzip:

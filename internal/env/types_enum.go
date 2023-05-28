@@ -4,10 +4,9 @@
 // Build Date: 2023-03-26T21:38:06Z
 // Built By: goreleaser
 
-package config
+package env
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -19,7 +18,19 @@ const (
 	CompressionGzip Compression = "gzip"
 )
 
-var ErrInvalidCompression = errors.New("not a valid Compression")
+var ErrInvalidCompression = fmt.Errorf("not a valid Compression, try [%s]", strings.Join(_CompressionNames, ", "))
+
+var _CompressionNames = []string{
+	string(CompressionNone),
+	string(CompressionGzip),
+}
+
+// CompressionNames returns a list of possible string values of Compression.
+func CompressionNames() []string {
+	tmp := make([]string, len(_CompressionNames))
+	copy(tmp, _CompressionNames)
+	return tmp
+}
 
 // String implements the Stringer interface.
 func (x Compression) String() string {
@@ -57,7 +68,19 @@ const (
 	ProtocolHttpProtobuf Protocol = "http/protobuf"
 )
 
-var ErrInvalidProtocol = errors.New("not a valid Protocol")
+var ErrInvalidProtocol = fmt.Errorf("not a valid Protocol, try [%s]", strings.Join(_ProtocolNames, ", "))
+
+var _ProtocolNames = []string{
+	string(ProtocolGrpc),
+	string(ProtocolHttpProtobuf),
+}
+
+// ProtocolNames returns a list of possible string values of Protocol.
+func ProtocolNames() []string {
+	tmp := make([]string, len(_ProtocolNames))
+	copy(tmp, _ProtocolNames)
+	return tmp
+}
 
 // String implements the Stringer interface.
 func (x Protocol) String() string {

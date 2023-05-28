@@ -1,4 +1,4 @@
-package config_test
+package env_test
 
 import (
 	"testing"
@@ -7,18 +7,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/angelokurtis/go-starter-otel/_test"
-	"github.com/angelokurtis/go-starter-otel/internal/config"
+	"github.com/angelokurtis/go-starter-otel/internal/env"
 	"github.com/angelokurtis/go-starter-otel/internal/trace"
 )
 
 func TestTrace_TracesExporter(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		exporter := traceConfig.TracesExporter()
-		assert.Equal(t, exporter, []trace.Exporter{trace.ExporterOtlp})
+		tr := env.ToTrace(otel)
+		assert.Equal(t, []trace.Exporter{trace.ExporterOtlp}, tr.Exporters)
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -27,78 +26,72 @@ func TestTrace_TracesExporter(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		exporter := traceConfig.TracesExporter()
-		assert.Equal(t, exporter, []trace.Exporter{trace.ExporterLogging, trace.ExporterZipkin})
+		tr := env.ToTrace(otel)
+		assert.Equal(t, []trace.Exporter{trace.ExporterLogging, trace.ExporterZipkin}, tr.Exporters)
 	})
 }
 
 func TestTrace_ExporterOTLPTracesEndpoint(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		endpoint := traceConfig.ExporterOTLPTracesEndpoint()
-		assert.Equal(t, endpoint.String(), "http://localhost:4317")
+		tr := env.ToTrace(otel)
+		assert.Equal(t, "http://localhost:4317", tr.Endpoint.String())
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
-			"EXPORTER_OTLP_TRACES_ENDPOINT": "https://otel.com:4317",
+			"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "https://otel.com:4317",
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		endpoint := traceConfig.ExporterOTLPTracesEndpoint()
-		assert.Equal(t, endpoint.String(), "https://otel.com:4317")
+		tr := env.ToTrace(otel)
+		assert.Equal(t, "https://otel.com:4317", tr.Endpoint.String())
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
-			"EXPORTER_OTLP_ENDPOINT":        "https://otel.com.br:4317",
-			"EXPORTER_OTLP_TRACES_ENDPOINT": "https://otel.com:4317",
+			"OTEL_EXPORTER_OTLP_ENDPOINT":        "https://otel.com.br:4317",
+			"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "https://otel.com:4317",
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		endpoint := traceConfig.ExporterOTLPTracesEndpoint()
-		assert.Equal(t, endpoint.String(), "https://otel.com:4317")
+		tr := env.ToTrace(otel)
+		assert.Equal(t, "https://otel.com:4317", tr.Endpoint.String())
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
-			"EXPORTER_OTLP_ENDPOINT": "https://otel.com.br:4317",
+			"OTEL_EXPORTER_OTLP_ENDPOINT": "https://otel.com.br:4317",
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		endpoint := traceConfig.ExporterOTLPTracesEndpoint()
-		assert.Equal(t, endpoint.String(), "https://otel.com.br:4317")
+		tr := env.ToTrace(otel)
+		assert.Equal(t, "https://otel.com.br:4317", tr.Endpoint.String())
 	})
 }
 
 func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		timeout := traceConfig.ExporterOTLPTracesTimeout()
+		tr := env.ToTrace(otel)
 		var oneSecond int64 = 1000
-		assert.Equal(t, timeout.Milliseconds(), oneSecond*10)
+		assert.Equal(t, oneSecond*10, tr.Timeout.Milliseconds())
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -107,13 +100,12 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		timeout := traceConfig.ExporterOTLPTracesTimeout()
+		tr := env.ToTrace(otel)
 		var oneMinute int64 = 60000
-		assert.Equal(t, timeout.Milliseconds(), oneMinute*1)
+		assert.Equal(t, oneMinute*1, tr.Timeout.Milliseconds())
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -123,24 +115,22 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		timeout := traceConfig.ExporterOTLPTracesTimeout()
+		tr := env.ToTrace(otel)
 		var oneMinute int64 = 60000
-		assert.Equal(t, timeout.Milliseconds(), oneMinute*60)
+		assert.Equal(t, oneMinute*60, tr.Timeout.Milliseconds())
 	})
 }
 
 func TestTrace_ExporterOTLPTracesProtocol(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		protocol := traceConfig.ExporterOTLPTracesProtocol()
-		assert.Equal(t, protocol, trace.ProtocolGrpc)
+		tr := env.ToTrace(otel)
+		assert.Equal(t, trace.ProtocolGrpc, tr.Protocol)
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -149,12 +139,11 @@ func TestTrace_ExporterOTLPTracesProtocol(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		protocol := traceConfig.ExporterOTLPTracesProtocol()
-		assert.Equal(t, protocol, trace.ProtocolHttpProtobuf)
+		tr := env.ToTrace(otel)
+		assert.Equal(t, trace.ProtocolHttpProtobuf, tr.Protocol)
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -164,23 +153,21 @@ func TestTrace_ExporterOTLPTracesProtocol(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		protocol := traceConfig.ExporterOTLPTracesProtocol()
-		assert.Equal(t, protocol, trace.ProtocolGrpc)
+		tr := env.ToTrace(otel)
+		assert.Equal(t, trace.ProtocolGrpc, tr.Protocol)
 	})
 }
 
 func TestTrace_ExporterOTLPTracesCompression(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		compression := traceConfig.ExporterOTLPTracesCompression()
-		assert.Equal(t, compression, trace.CompressionGzip)
+		tr := env.ToTrace(otel)
+		assert.Equal(t, trace.CompressionGzip, tr.Compression)
 	})
 	t.Run("", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
@@ -189,11 +176,10 @@ func TestTrace_ExporterOTLPTracesCompression(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		env, err := config.NewFromEnv()
+		otel, err := env.LookupOTel()
 		require.NoError(t, err)
 
-		var traceConfig trace.Config = config.NewTrace(env)
-		compression := traceConfig.ExporterOTLPTracesCompression()
-		assert.Equal(t, compression, trace.CompressionNone)
+		tr := env.ToTrace(otel)
+		assert.Equal(t, trace.CompressionNone, tr.Compression)
 	})
 }

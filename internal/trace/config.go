@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-type Config interface {
-	TracesExporter() []Exporter
-	ExporterOTLPTracesEndpoint() *url.URL
-	ExporterOTLPTracesTimeout() time.Duration
-	ExporterOTLPTracesProtocol() Protocol
-	ExporterOTLPTracesCompression() Compression
-	TracesSampler() Sampler
-	TracesSamplerArg() float64
-	Propagators() []Propagator // TODO: setup propagators
+type Config struct {
+	Exporters   []Exporter
+	Endpoint    url.URL
+	Timeout     time.Duration
+	Protocol    Protocol
+	Compression Compression
+	Sampler     Sampler
+	SamplerArg  float64
+	Propagators []Propagator
 }
