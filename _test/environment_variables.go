@@ -1,6 +1,8 @@
 package _test
 
-import "os"
+import (
+	"os"
+)
 
 // EnvironmentVariables is designed for managing environment variables in tests and ensuring a clean testing environment.
 type EnvironmentVariables struct{ keys []string }
