@@ -90,7 +90,9 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		require.NoError(t, err)
 
 		tr := env.ToTrace(otel)
+
 		var oneSecond int64 = 1000
+
 		assert.Equal(t, oneSecond*10, tr.Timeout.Milliseconds())
 	})
 	t.Run("", func(t *testing.T) {
@@ -104,7 +106,9 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		require.NoError(t, err)
 
 		tr := env.ToTrace(otel)
+
 		var oneMinute int64 = 60000
+
 		assert.Equal(t, oneMinute*1, tr.Timeout.Milliseconds())
 	})
 	t.Run("", func(t *testing.T) {
@@ -119,7 +123,9 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		require.NoError(t, err)
 
 		tr := env.ToTrace(otel)
+
 		var oneMinute int64 = 60000
+
 		assert.Equal(t, oneMinute*60, tr.Timeout.Milliseconds())
 	})
 }
