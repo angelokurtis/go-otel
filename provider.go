@@ -43,7 +43,7 @@ func Init(ctx context.Context) (*Provider, func(), error) {
 	}
 
 	tp, cleanup := trace.NewTracerProvider(ctx, r, s, se, config)
-	p := trace.NewTextMapPropagator(ctx, config)
+	p := trace.NewTextMapPropagator(config)
 	provider := &Provider{
 		Tracer:      tp,
 		propagation: p,
