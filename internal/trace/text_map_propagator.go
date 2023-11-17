@@ -1,8 +1,6 @@
 package trace
 
 import (
-	"context"
-
 	xraypropagator "go.opentelemetry.io/contrib/propagators/aws/xray"
 	b3propagator "go.opentelemetry.io/contrib/propagators/b3"
 	jaegerpropagator "go.opentelemetry.io/contrib/propagators/jaeger"
@@ -11,7 +9,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
-func NewTextMapPropagator(ctx context.Context, config *Config) propagation.TextMapPropagator {
+func NewTextMapPropagator(config *Config) propagation.TextMapPropagator {
 	propagators := make([]propagation.TextMapPropagator, 0, len(config.Propagators))
 
 	for _, propagator := range config.Propagators {
