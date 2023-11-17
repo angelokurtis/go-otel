@@ -47,6 +47,7 @@ func ParseCompression(name string) (Compression, error) {
 	if x, ok := _CompressionValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Compression(""), fmt.Errorf("%s is %w", name, ErrInvalidCompression)
 }
 
@@ -94,6 +95,7 @@ func ParseExporter(name string) (Exporter, error) {
 	if x, ok := _ExporterValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Exporter(""), fmt.Errorf("%s is %w", name, ErrInvalidExporter)
 }
 
@@ -104,6 +106,8 @@ const (
 	PropagatorBaggage Propagator = "baggage"
 	// PropagatorB3 is a Propagator of type b3.
 	PropagatorB3 Propagator = "b3"
+	// PropagatorB3multi is a Propagator of type b3multi.
+	PropagatorB3multi Propagator = "b3multi"
 	// PropagatorJaeger is a Propagator of type jaeger.
 	PropagatorJaeger Propagator = "jaeger"
 	// PropagatorXray is a Propagator of type xray.
@@ -130,6 +134,7 @@ var _PropagatorValue = map[string]Propagator{
 	"tracecontext": PropagatorTracecontext,
 	"baggage":      PropagatorBaggage,
 	"b3":           PropagatorB3,
+	"b3multi":      PropagatorB3multi,
 	"jaeger":       PropagatorJaeger,
 	"xray":         PropagatorXray,
 	"ottrace":      PropagatorOttrace,
@@ -144,6 +149,7 @@ func ParsePropagator(name string) (Propagator, error) {
 	if x, ok := _PropagatorValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Propagator(""), fmt.Errorf("%s is %w", name, ErrInvalidPropagator)
 }
 
@@ -182,6 +188,7 @@ func ParseProtocol(name string) (Protocol, error) {
 	if x, ok := _ProtocolValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Protocol(""), fmt.Errorf("%s is %w", name, ErrInvalidProtocol)
 }
 
@@ -232,5 +239,6 @@ func ParseSampler(name string) (Sampler, error) {
 	if x, ok := _SamplerValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Sampler(""), fmt.Errorf("%s is %w", name, ErrInvalidSampler)
 }

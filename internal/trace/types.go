@@ -11,7 +11,7 @@ type Compression string
 type Exporter string
 
 // Propagator determine which distributed tracing header formats are used, and which baggage propagation header formats are used.
-// ENUM(tracecontext, baggage, b3, jaeger, xray, ottrace)
+// ENUM(tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace)
 type Propagator string
 
 // Protocol defines the encoding of telemetry data and the protocol used to exchange spans between the client and the server.
