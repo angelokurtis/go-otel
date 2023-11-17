@@ -29,6 +29,7 @@ var _CompressionNames = []string{
 func CompressionNames() []string {
 	tmp := make([]string, len(_CompressionNames))
 	copy(tmp, _CompressionNames)
+
 	return tmp
 }
 
@@ -58,6 +59,7 @@ func ParseCompression(name string) (Compression, error) {
 	if x, ok := _CompressionValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Compression(""), fmt.Errorf("%s is %w", name, ErrInvalidCompression)
 }
 
@@ -79,6 +81,7 @@ var _ProtocolNames = []string{
 func ProtocolNames() []string {
 	tmp := make([]string, len(_ProtocolNames))
 	copy(tmp, _ProtocolNames)
+
 	return tmp
 }
 
@@ -108,5 +111,6 @@ func ParseProtocol(name string) (Protocol, error) {
 	if x, ok := _ProtocolValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Protocol(""), fmt.Errorf("%s is %w", name, ErrInvalidProtocol)
 }
