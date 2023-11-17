@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/angelokurtis/go-starter-otel/internal/env"
@@ -18,7 +17,10 @@ type Providers struct {
 }
 
 func SetupProviders(ctx context.Context) (*Providers, func(), error) {
-	r := resource.Environment()
+	r, err := intltrace.NewResource(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	o, err := env.LookupOTel()
 	if err != nil {
