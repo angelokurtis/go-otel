@@ -47,6 +47,7 @@ func ParseCompression(name string) (Compression, error) {
 	if x, ok := _CompressionValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Compression(""), fmt.Errorf("%s is %w", name, ErrInvalidCompression)
 }
 
@@ -91,6 +92,7 @@ func ParseExporter(name string) (Exporter, error) {
 	if x, ok := _ExporterValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Exporter(""), fmt.Errorf("%s is %w", name, ErrInvalidExporter)
 }
 
@@ -129,5 +131,6 @@ func ParseProtocol(name string) (Protocol, error) {
 	if x, ok := _ProtocolValue[strings.ToLower(name)]; ok {
 		return x, nil
 	}
+
 	return Protocol(""), fmt.Errorf("%s is %w", name, ErrInvalidProtocol)
 }
