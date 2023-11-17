@@ -23,6 +23,14 @@ func newGRPCTraceClient(config *Config) (otlptrace.Client, error) {
 	endpoint := config.Endpoint
 	opts := []otlptracegrpc.Option{otlptracegrpc.WithEndpoint(endpoint.Host)}
 
+	switch compression := config.Compression; compression {
+	case CompressionNone:
+	case CompressionGzip:
+		opts = append(opts, otlptracegrpc.WithCompressor(compression.String()))
+	default:
+		return nil, fmt.Errorf("unrecognized value for traces GRPC compression: %s", compression)
+	}
+
 	if endpoint.Scheme != "https" {
 		opts = append(opts, otlptracegrpc.WithInsecure())
 	}
