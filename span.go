@@ -17,7 +17,7 @@ func StartSpanFromContext(ctx context.Context) (context.Context, trace.Span) {
 	return tracer.Start(ctx, fn)
 }
 
-func getCaller() (string, string) {
+func getCaller() (pkg, fn string) {
 	pc, _, _, _ := runtime.Caller(2)
 	f := runtime.FuncForPC(pc).Name()
 

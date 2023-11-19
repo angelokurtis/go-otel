@@ -3,12 +3,13 @@ package trace
 import (
 	"context"
 
+	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-func NewTracerProvider(ctx context.Context, res *resource.Resource, sampler trace.Sampler, exporters []trace.SpanExporter, config *Config) (*trace.TracerProvider, func()) {
+func NewTracerProvider(ctx context.Context, logger logr.Logger, res *resource.Resource, sampler trace.Sampler, exporters []trace.SpanExporter, config *Config) (*trace.TracerProvider, func()) {
 	options := []trace.TracerProviderOption{
 		trace.WithResource(res),
 		trace.WithSampler(sampler),
@@ -24,7 +25,9 @@ func NewTracerProvider(ctx context.Context, res *resource.Resource, sampler trac
 	otel.SetTracerProvider(tp)
 
 	cleanup := func() {
-		_ = tp.Shutdown(ctx)
+		if err := tp.Shutdown(ctx); err != nil {
+			logger.V(1).Info("Error shutting down Tracer Provider", "err", err)
+		}
 	}
 
 	return tp, cleanup
