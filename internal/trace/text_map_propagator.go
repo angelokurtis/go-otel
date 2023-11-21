@@ -5,34 +5,30 @@ import (
 	b3propagator "go.opentelemetry.io/contrib/propagators/b3"
 	jaegerpropagator "go.opentelemetry.io/contrib/propagators/jaeger"
 	otpropagator "go.opentelemetry.io/contrib/propagators/ot"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
 
-func NewTextMapPropagator(config *Config) propagation.TextMapPropagator {
-	propagators := make([]propagation.TextMapPropagator, 0, len(config.Propagators))
+func NewTextMapPropagator(propagators Propagators) propagation.TextMapPropagator {
+	props := make([]propagation.TextMapPropagator, 0, len(propagators))
 
-	for _, propagator := range config.Propagators {
+	for _, propagator := range propagators {
 		switch propagator {
 		case PropagatorTracecontext:
-			propagators = append(propagators, propagation.TraceContext{})
+			props = append(props, propagation.TraceContext{})
 		case PropagatorBaggage:
-			propagators = append(propagators, propagation.Baggage{})
+			props = append(props, propagation.Baggage{})
 		case PropagatorB3:
-			propagators = append(propagators, b3propagator.New(b3propagator.WithInjectEncoding(b3propagator.B3SingleHeader)))
+			props = append(props, b3propagator.New(b3propagator.WithInjectEncoding(b3propagator.B3SingleHeader)))
 		case PropagatorB3multi:
-			propagators = append(propagators, b3propagator.New(b3propagator.WithInjectEncoding(b3propagator.B3MultipleHeader)))
+			props = append(props, b3propagator.New(b3propagator.WithInjectEncoding(b3propagator.B3MultipleHeader)))
 		case PropagatorJaeger:
-			propagators = append(propagators, jaegerpropagator.Jaeger{})
+			props = append(props, jaegerpropagator.Jaeger{})
 		case PropagatorXray:
-			propagators = append(propagators, xraypropagator.Propagator{})
+			props = append(props, xraypropagator.Propagator{})
 		case PropagatorOttrace:
-			propagators = append(propagators, otpropagator.OT{})
+			props = append(props, otpropagator.OT{})
 		}
 	}
 
-	propagator := propagation.NewCompositeTextMapPropagator(propagators...)
-	otel.SetTextMapPropagator(propagator)
-
-	return propagator
+	return propagation.NewCompositeTextMapPropagator(props...)
 }

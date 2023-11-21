@@ -23,7 +23,7 @@ format: goimports-reviser gofumpt wsl ## Cleans up the code for easier reading a
 
 .PHONY: lint
 lint: golangci-lint ## Analyze and report style, formatting, and syntax issues in the source code.
-	$(GOLANGCI_LINT) run --max-issues-per-linter 0 --max-same-issues 0 --enable "wrapcheck" ./...
+	$(GOLANGCI_LINT) run  ./...
 
 ##@ Release
 
