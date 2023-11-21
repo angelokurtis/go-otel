@@ -14,7 +14,7 @@ func TestNewFromEnv(t *testing.T) {
 	t.Run(`Given no environment variables have been set
 When a new configuration object is created
 Then the object should have default values and no errors should occur`, func(t *testing.T) {
-		cfg, err := env.LookupOTel()
+		cfg, err := env.LookupVariables()
 		require.NoError(t, err)
 
 		assert.NotNil(t, cfg)
@@ -26,7 +26,7 @@ Then an error should be returned`, func(t *testing.T) {
 		envvars := _test.SetEnvironmentVariables(map[string]string{"OTEL_TRACES_SAMPLER_ARG": "example.com"})
 		defer envvars.Unset()
 
-		cfg, err := env.LookupOTel()
+		cfg, err := env.LookupVariables()
 		assert.Error(t, err)
 
 		assert.Nil(t, cfg)

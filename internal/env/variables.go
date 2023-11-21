@@ -11,7 +11,7 @@ import (
 	"github.com/angelokurtis/go-starter-otel/internal/trace"
 )
 
-type OTel struct {
+type Variables struct {
 	Traces struct {
 		Exporter []trace.Exporter `envDefault:"otlp"`
 		Sampler  struct {
@@ -50,11 +50,11 @@ type OTel struct {
 	Propagators []trace.Propagator `envDefault:"tracecontext,baggage"`
 }
 
-// LookupOTel takes advantage of the `envconfig` package to parse environment variables into the OTel struct. If any of
-// the environment variables are missing or have an invalid value, the method returns an error with a detailed message
-// that explains the cause of the failure.
-func LookupOTel() (*OTel, error) {
-	var otel OTel
+// LookupVariables takes advantage of the `envconfig` package to parse environment variables into the Variables struct.
+// If any of the environment variables are missing or have an invalid value, the method returns an error with a detailed
+// message that explains the cause of the failure.
+func LookupVariables() (*Variables, error) {
+	var otel Variables
 
 	err := env.ParseWithOptions(&otel, env.Options{
 		Prefix:                "OTEL_",
