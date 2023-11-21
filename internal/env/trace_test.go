@@ -1,7 +1,9 @@
 package env_test
 
 import (
+	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,50 +14,50 @@ import (
 )
 
 func TestTrace_TracesExporter(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		otel, err := env.LookupOTel()
+	t.Run("it should correctly identify the default trace exporters", func(t *testing.T) {
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, []trace.Exporter{trace.ExporterOtlp}, tr.Exporters)
+		exporters := env.ToTraceExporters(variables)
+		assert.Equal(t, trace.Exporters{trace.ExporterOtlp}, exporters)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should correctly identify the specified trace exporters", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_TRACES_EXPORTER": "logging,zipkin",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, []trace.Exporter{trace.ExporterLogging, trace.ExporterZipkin}, tr.Exporters)
+		exporters := env.ToTraceExporters(variables)
+		assert.Equal(t, trace.Exporters{trace.ExporterLogging, trace.ExporterZipkin}, exporters)
 	})
 }
 
 func TestTrace_ExporterOTLPTracesEndpoint(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		otel, err := env.LookupOTel()
+	t.Run("it should be set to the default value http://localhost:4317", func(t *testing.T) {
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, "http://localhost:4317", tr.Endpoint.String())
+		endpoint := url.URL(env.ToTraceEndpoint(variables))
+		assert.Equal(t, "http://localhost:4317", endpoint.String())
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should reflect the specified custom endpoint", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "https://otel.com:4317",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, "https://otel.com:4317", tr.Endpoint.String())
+		endpoint := url.URL(env.ToTraceEndpoint(variables))
+		assert.Equal(t, "https://otel.com:4317", endpoint.String())
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should prioritize OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_ENDPOINT":        "https://otel.com.br:4317",
@@ -63,55 +65,51 @@ func TestTrace_ExporterOTLPTracesEndpoint(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, "https://otel.com:4317", tr.Endpoint.String())
+		endpoint := url.URL(env.ToTraceEndpoint(variables))
+		assert.Equal(t, "https://otel.com:4317", endpoint.String())
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should use OTEL_EXPORTER_OTLP_ENDPOINT as the OTLP traces endpoint", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_ENDPOINT": "https://otel.com.br:4317",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, "https://otel.com.br:4317", tr.Endpoint.String())
+		endpoint := url.URL(env.ToTraceEndpoint(variables))
+		assert.Equal(t, "https://otel.com.br:4317", endpoint.String())
 	})
 }
 
 func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		otel, err := env.LookupOTel()
+	t.Run("it should be set to the default value of 10 seconds", func(t *testing.T) {
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
+		timeout := time.Duration(env.ToTraceTimeout(variables))
 
-		var oneSecond int64 = 1000
-
-		assert.Equal(t, oneSecond*10, tr.Timeout.Milliseconds())
+		assert.Equal(t, 10*time.Second, timeout)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should reflect the specified custom timeout", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_TIMEOUT": "1m",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
+		timeout := time.Duration(env.ToTraceTimeout(variables))
 
-		var oneMinute int64 = 60000
-
-		assert.Equal(t, oneMinute*1, tr.Timeout.Milliseconds())
+		assert.Equal(t, 1*time.Minute, timeout)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should prioritize OTEL_EXPORTER_OTLP_TRACES_TIMEOUT", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_TIMEOUT":        "10m",
@@ -119,39 +117,37 @@ func TestTrace_ExporterOTLPTracesTimeout(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
+		timeout := time.Duration(env.ToTraceTimeout(variables))
 
-		var oneMinute int64 = 60000
-
-		assert.Equal(t, oneMinute*60, tr.Timeout.Milliseconds())
+		assert.Equal(t, 60*time.Minute, timeout)
 	})
 }
 
 func TestTrace_ExporterOTLPTracesProtocol(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		otel, err := env.LookupOTel()
+	t.Run("it should be set to the default value gRPC", func(t *testing.T) {
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, trace.ProtocolGrpc, tr.Protocol)
+		protocol := env.ToTraceProtocol(variables)
+		assert.Equal(t, trace.ProtocolGrpc, protocol)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should reflect the specified custom protocol", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL": "http/protobuf",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, trace.ProtocolHttpProtobuf, tr.Protocol)
+		protocol := env.ToTraceProtocol(variables)
+		assert.Equal(t, trace.ProtocolHttpProtobuf, protocol)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should prioritize OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_PROTOCOL":        "http/protobuf",
@@ -159,33 +155,33 @@ func TestTrace_ExporterOTLPTracesProtocol(t *testing.T) {
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, trace.ProtocolGrpc, tr.Protocol)
+		protocol := env.ToTraceProtocol(variables)
+		assert.Equal(t, trace.ProtocolGrpc, protocol)
 	})
 }
 
 func TestTrace_ExporterOTLPTracesCompression(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		otel, err := env.LookupOTel()
+	t.Run("it should be set to the default value Gzip", func(t *testing.T) {
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, trace.CompressionGzip, tr.Compression)
+		compression := env.ToTraceCompression(variables)
+		assert.Equal(t, trace.CompressionGzip, compression)
 	})
-	t.Run("", func(t *testing.T) {
+	t.Run("it should reflect the specified custom compression", func(t *testing.T) {
 		// set the environment variables and ensure that the environment variable is cleaned up after the test
 		envvars := _test.SetEnvironmentVariables(map[string]string{
 			"OTEL_EXPORTER_OTLP_TRACES_COMPRESSION": "none",
 		})
 		defer envvars.Unset()
 
-		otel, err := env.LookupOTel()
+		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		tr := env.ToTrace(otel)
-		assert.Equal(t, trace.CompressionNone, tr.Compression)
+		compression := env.ToTraceCompression(variables)
+		assert.Equal(t, trace.CompressionNone, compression)
 	})
 }
