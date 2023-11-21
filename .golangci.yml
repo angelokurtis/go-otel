@@ -61,7 +61,6 @@ linters-settings:
       { name: "imports-blacklist", disabled: false },
       { name: "increment-decrement", disabled: false },
       { name: "indent-error-flow", disabled: false },
-      { name: "max-public-structs", disabled: false },
       { name: "modifies-parameter", disabled: false },
       { name: "modifies-value-receiver", disabled: false },
       { name: "optimize-operands-order", disabled: false },

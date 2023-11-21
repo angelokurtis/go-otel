@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/angelokurtis/go-starter-otel/internal/env"
@@ -14,8 +13,6 @@ import (
 
 type Providers struct {
 	TracerProvider *sdktrace.TracerProvider
-
-	propagation propagation.TextMapPropagator
 }
 
 func SetupProviders(ctx context.Context) (*Providers, func(), error) {
@@ -24,37 +21,51 @@ func SetupProviders(ctx context.Context) (*Providers, func(), error) {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	o, err := env.LookupOTel()
+	variables, err := env.LookupVariables()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	config := env.ToTrace(o)
-
-	s, err := intltrace.NewSampler(config)
+	s, err := intltrace.NewSampler(intltrace.SamplerOptions{
+		Sampler:    env.ToTraceSampler(variables),
+		SamplerArg: env.ToTraceSamplerArg(variables),
+	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	c, err := intltrace.NewTraceClient(config)
+	c, err := intltrace.NewClient(intltrace.ClientOptions{
+		Protocol:    env.ToTraceProtocol(variables),
+		Endpoint:    env.ToTraceEndpoint(variables),
+		Compression: env.ToTraceCompression(variables),
+	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	se, err := intltrace.NewSpanExporters(ctx, config, c)
+	se, err := intltrace.NewSpanExporters(ctx, intltrace.SpanExportersOptions{
+		Exporters: env.ToTraceExporters(variables),
+		Client:    c,
+	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	l := logger.New()
-	tp, cleanup := intltrace.NewTracerProvider(ctx, l, r, s, se, config)
-	p := intltrace.NewTextMapPropagator(config)
-	provider := &Providers{
+	p := intltrace.NewTextMapPropagator(env.ToTracePropagators(variables))
+	log := logger.New()
+	tp, cleanup := intltrace.NewTracerProvider(ctx, intltrace.TracerProviderOptions{
+		Resource:     r,
+		Sampler:      s,
+		Exporters:    se,
+		BatchTimeout: env.ToTraceTimeout(variables),
+		Propagator:   p,
+		Logger:       log,
+	})
+	provs := &Providers{
 		TracerProvider: tp,
-		propagation:    p,
 	}
 
-	return provider, func() {
+	return provs, func() {
 		cleanup()
 	}, nil
 }
