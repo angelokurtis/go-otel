@@ -14,7 +14,6 @@ import (
 //
 // Example:
 //
-//	ctx := context.Background()
 //	ctx, span := otel.StartSpanFromContext(ctx)
 //	defer span.End()
 func StartSpanFromContext(ctx context.Context) (context.Context, trace.Span) {
