@@ -9,6 +9,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// StartSpanFromContext starts a new OpenTelemetry span using the provided context.
+// It returns a new context containing the started span and the started span itself.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	ctx, span := otel.StartSpanFromContext(ctx)
+//	defer span.End()
 func StartSpanFromContext(ctx context.Context) (context.Context, trace.Span) {
 	provider := otel.GetTracerProvider()
 	pkg, fn := getCaller()
