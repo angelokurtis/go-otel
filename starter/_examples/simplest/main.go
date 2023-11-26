@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	otel "github.com/angelokurtis/go-starter-otel"
+	otelstarter "github.com/angelokurtis/go-otel/starter"
 )
 
 func main() {
 	// Initialize OpenTelemetry with environment variables
-	_, shutdown, err := otel.SetupProviders(context.Background())
+	_, shutdown, err := otelstarter.SetupProviders(context.Background())
 	if err != nil {
 		log.Fatalf("Error initializing OpenTelemetry: %v", err)
 	}
@@ -18,10 +18,6 @@ func main() {
 
 	// Example HTTP server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		ctx, span := otel.StartSpanFromContext(ctx)
-		defer span.End()
-
 		// Your application code here
 
 		w.Write([]byte("Hello, World!"))

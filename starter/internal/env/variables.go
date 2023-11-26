@@ -7,8 +7,8 @@ import (
 
 	env "github.com/caarlos0/env/v10"
 
-	"github.com/angelokurtis/go-starter-otel/internal/metric"
-	"github.com/angelokurtis/go-starter-otel/internal/trace"
+	"github.com/angelokurtis/go-otel/starter/internal/metric"
+	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 type Variables struct {

@@ -6,9 +6,9 @@ import (
 
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/angelokurtis/go-starter-otel/internal/env"
-	"github.com/angelokurtis/go-starter-otel/internal/logger"
-	intltrace "github.com/angelokurtis/go-starter-otel/internal/trace"
+	"github.com/angelokurtis/go-otel/starter/internal/env"
+	"github.com/angelokurtis/go-otel/starter/internal/logger"
+	intltrace "github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 // Providers struct holds the TracerProvider for OpenTelemetry.

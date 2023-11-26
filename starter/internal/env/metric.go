@@ -3,7 +3,7 @@ package env
 import (
 	"github.com/gotidy/ptr"
 
-	"github.com/angelokurtis/go-starter-otel/internal/metric"
+	"github.com/angelokurtis/go-otel/starter/internal/metric"
 )
 
 func ToMetricExporters(otel *Variables) metric.Exporters {

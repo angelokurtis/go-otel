@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/angelokurtis/go-starter-otel/_test"
-	"github.com/angelokurtis/go-starter-otel/internal/env"
+	"github.com/angelokurtis/go-otel/starter/_test"
+	"github.com/angelokurtis/go-otel/starter/internal/env"
 )
 
 func TestNewFromEnv(t *testing.T) {
