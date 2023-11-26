@@ -97,8 +97,8 @@ func ParseExporter(name string) (Exporter, error) {
 }
 
 const (
-	// ProtocolGRpc is a Protocol of type g rpc.
-	ProtocolGRpc Protocol = "g rpc"
+	// ProtocolGrpc is a Protocol of type grpc.
+	ProtocolGrpc Protocol = "grpc"
 	// ProtocolHttpProtobuf is a Protocol of type http/protobuf.
 	ProtocolHttpProtobuf Protocol = "http/protobuf"
 )
@@ -118,7 +118,7 @@ func (x Protocol) IsValid() bool {
 }
 
 var _ProtocolValue = map[string]Protocol{
-	"g rpc":         ProtocolGRpc,
+	"grpc":          ProtocolGrpc,
 	"http/protobuf": ProtocolHttpProtobuf,
 }
 
