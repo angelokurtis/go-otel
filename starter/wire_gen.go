@@ -8,10 +8,10 @@ package otel
 
 import (
 	"context"
-	"github.com/angelokurtis/go-starter-otel/internal/env"
-	"github.com/angelokurtis/go-starter-otel/internal/logger"
-	"github.com/angelokurtis/go-starter-otel/internal/metric"
-	"github.com/angelokurtis/go-starter-otel/internal/trace"
+	"github.com/angelokurtis/go-otel/starter/internal/env"
+	"github.com/angelokurtis/go-otel/starter/internal/logger"
+	"github.com/angelokurtis/go-otel/starter/internal/metric"
+	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 // Injectors from wire_inj.go:

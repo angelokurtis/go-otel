@@ -5,10 +5,10 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/angelokurtis/go-starter-otel/internal/env"
-	"github.com/angelokurtis/go-starter-otel/internal/logger"
-	intlmetric "github.com/angelokurtis/go-starter-otel/internal/metric"
-	intltrace "github.com/angelokurtis/go-starter-otel/internal/trace"
+	"github.com/angelokurtis/go-otel/starter/internal/env"
+	"github.com/angelokurtis/go-otel/starter/internal/logger"
+	intlmetric "github.com/angelokurtis/go-otel/starter/internal/metric"
+	intltrace "github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 //nolint:unused // This function is used during compile-time to generate code for dependency injection

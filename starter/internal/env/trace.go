@@ -3,7 +3,7 @@ package env
 import (
 	"github.com/gotidy/ptr"
 
-	"github.com/angelokurtis/go-starter-otel/internal/trace"
+	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 func ToTraceExporters(otel *Variables) trace.Exporters {
