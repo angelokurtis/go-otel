@@ -23,7 +23,7 @@ next-version: svu ## Calculate the next version, following semantic versioning.
 	echo $$next_version
 
 .PHONY: auto-release
-auto-release: build svu ## Automate release tasks based on git log.
+auto-release: svu ## Automate release tasks based on git log.
 	@current_version=$$($(SVU) current); \
 	next_version=$$($(SVU) next); \
 	if [ "$$current_version" = "$$next_version" ]; then \
@@ -42,7 +42,7 @@ auto-release: build svu ## Automate release tasks based on git log.
 	echo "$$next_version has been released successfully"
 
 .PHONY: major-release
-major-release: build svu ## Force a major release with significant changes.
+major-release: svu ## Force a major release with significant changes.
 	@current_branch=$$(git rev-parse --abbrev-ref HEAD); \
 	remote_branch=$$(git for-each-ref --format='%(upstream:short)' refs/heads/"$$current_branch"); \
 	if [ "$$remote_branch" != "origin/main" ]; then \
@@ -55,7 +55,7 @@ major-release: build svu ## Force a major release with significant changes.
 	echo "$$next_version has been released successfully"
 
 .PHONY: minor-release
-minor-release: build svu ## Force a minor release with new features.
+minor-release: svu ## Force a minor release with new features.
 	@current_branch=$$(git rev-parse --abbrev-ref HEAD); \
 	remote_branch=$$(git for-each-ref --format='%(upstream:short)' refs/heads/"$$current_branch"); \
 	if [ "$$remote_branch" != "origin/main" ]; then \
@@ -68,7 +68,7 @@ minor-release: build svu ## Force a minor release with new features.
 	echo "$$next_version has been released successfully"
 
 .PHONY: patch-release
-patch-release: build svu ## Force a patch release with bug fixes.
+patch-release: svu ## Force a patch release with bug fixes.
 	@current_branch=$$(git rev-parse --abbrev-ref HEAD); \
 	remote_branch=$$(git for-each-ref --format='%(upstream:short)' refs/heads/"$$current_branch"); \
 	if [ "$$remote_branch" != "origin/main" ]; then \
