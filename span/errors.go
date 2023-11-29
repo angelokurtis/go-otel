@@ -8,9 +8,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// WrapError wraps the given error and records it as an error in the current OpenTelemetry span.
+// Error wraps the given error and records it as an error in the current OpenTelemetry span.
 // If the provided error is nil, it returns nil.
-func WrapError(ctx context.Context, err error) error {
+func Error(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
@@ -29,10 +29,10 @@ func WrapError(ctx context.Context, err error) error {
 	return err
 }
 
-// WrapErrorWithStack wraps the given error, records it as an error in the current OpenTelemetry span,
+// ErrorWithStack wraps the given error, records it as an error in the current OpenTelemetry span,
 // and includes the stack trace information in the recorded error.
 // If the provided error is nil, it returns nil.
-func WrapErrorWithStack(ctx context.Context, err error) error {
+func ErrorWithStack(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
