@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Initialize OpenTelemetry with environment variables
-	_, shutdown, err := otelstarter.SetupProviders(context.Background())
+	_, shutdown, err := otelstarter.StartProviders(context.Background())
 	if err != nil {
 		log.Fatalf("Error initializing OpenTelemetry: %v", err)
 	}

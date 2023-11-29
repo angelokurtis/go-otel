@@ -19,9 +19,11 @@ type Providers struct {
 	MeterProvider  *metric.MeterProvider
 }
 
-// SetupProviders initializes and configures OpenTelemetry providers.
-// It returns a Providers struct containing the TracerProvider, a cleanup function, and an error if setup fails.
-func SetupProviders(ctx context.Context) (*Providers, func(), error) {
+type ShutdownFunc func()
+
+// StartProviders initializes and configures OpenTelemetry providers.
+// It returns a Providers struct containing the TracerProvider, a shutdown function, and an error if setup fails.
+func StartProviders(ctx context.Context) (*Providers, ShutdownFunc, error) {
 	// Create a new OpenTelemetry resource.
 	r, err := intltrace.NewResource(ctx)
 	if err != nil {
