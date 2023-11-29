@@ -6,7 +6,16 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
+
+const (
+	libraryName    = "github.com/angelokurtis/go-otel/span"
+	libraryVersion = "1.0.0"
+)
+
+// EndFunc is a function type that can be used to end an OpenTelemetry span.
+type EndFunc func(options ...trace.SpanEndOption)
 
 // Start starts a new OpenTelemetry span using the provided context.
 // It returns a new context containing the started span and a function to end the span.
@@ -15,24 +24,25 @@ import (
 //
 //	ctx, end := span.Start(ctx)
 //	defer end()
-func Start(ctx context.Context) (context.Context, func()) {
+func Start(ctx context.Context, options ...trace.SpanStartOption) (context.Context, EndFunc) {
 	provider := otel.GetTracerProvider()
-	pkg, fn := getCaller()
-	tracer := provider.Tracer(pkg)
+	_, fn := getCaller()
+	tracer := provider.Tracer(libraryName, trace.WithInstrumentationVersion(libraryVersion))
 
-	ctx, span := tracer.Start(ctx, fn)
-	return ctx, func() { span.End() }
+	ctx, span := tracer.Start(ctx, fn, options...)
+
+	return ctx, span.End
 }
 
 // StartWithName starts a new OpenTelemetry span with the given name using the provided context.
 // It returns a new context containing the started span and a function to end the span.
-func StartWithName(ctx context.Context, name string) (context.Context, func()) {
+func StartWithName(ctx context.Context, name string, options ...trace.SpanStartOption) (context.Context, EndFunc) {
 	provider := otel.GetTracerProvider()
-	pkg, _ := getCaller()
-	tracer := provider.Tracer(pkg)
+	tracer := provider.Tracer(libraryName, trace.WithInstrumentationVersion(libraryVersion))
 
-	ctx, span := tracer.Start(ctx, name)
-	return ctx, func() { span.End() }
+	ctx, span := tracer.Start(ctx, name, options...)
+
+	return ctx, span.End
 }
 
 func getCaller() (pkg, fn string) {
