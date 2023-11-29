@@ -1,19 +1,22 @@
-package otel
+package starter
 
 import (
 	"context"
 	"fmt"
 
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/trace"
 
 	"github.com/angelokurtis/go-otel/starter/internal/env"
 	"github.com/angelokurtis/go-otel/starter/internal/logger"
+	intlmetric "github.com/angelokurtis/go-otel/starter/internal/metric"
 	intltrace "github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
 // Providers struct holds the TracerProvider for OpenTelemetry.
 type Providers struct {
-	TracerProvider *sdktrace.TracerProvider
+	TracerProvider *trace.TracerProvider
+	MeterProvider  *metric.MeterProvider
 }
 
 // SetupProviders initializes and configures OpenTelemetry providers.
@@ -59,11 +62,12 @@ func SetupProviders(ctx context.Context) (*Providers, func(), error) {
 		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	// Create a text map propagator based on environment variables.
-	p := intltrace.NewTextMapPropagator(env.ToTracePropagators(variables))
+	// Create a logger for tracing and metrics.
 	log := logger.New()
-	// Create a TracerProvider with the configured options.
-	tp, cleanup := intltrace.NewTracerProvider(ctx, intltrace.TracerProviderOptions{
+
+	// Create a TracerProvider with configured options.
+	p := intltrace.NewTextMapPropagator(env.ToTracePropagators(variables))
+	tracerProvider, traceCleanup := intltrace.NewTracerProvider(ctx, intltrace.TracerProviderOptions{
 		Resource:     r,
 		Sampler:      s,
 		Exporters:    se,
@@ -71,12 +75,36 @@ func SetupProviders(ctx context.Context) (*Providers, func(), error) {
 		Propagator:   p,
 		Logger:       log,
 	})
-	provs := &Providers{
-		TracerProvider: tp,
+	exportInterval := env.ToMetricExportInterval(variables)
+
+	// Create metric readers based on environment variables.
+	readers, err := intlmetric.NewReaders(ctx, intlmetric.ReadersOptions{
+		Exporters:      env.ToMetricExporters(variables),
+		Endpoint:       env.ToMetricEndpoint(variables),
+		Compression:    env.ToMetricCompression(variables),
+		ExportInterval: exportInterval,
+		Protocol:       env.ToMetricProtocol(variables),
+	})
+	if err != nil {
+		traceCleanup()
+		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
 	}
 
-	// Return the initialized TracerProvider and cleanup function.
+	// Create a MeterProvider with configured options.
+	meterProvider, metricCleanup := intlmetric.NewMeterProvider(ctx, intlmetric.MeterProviderOptions{
+		Resource:       r,
+		Readers:        readers,
+		ExportInterval: exportInterval,
+		Logger:         log,
+	})
+	provs := &Providers{
+		TracerProvider: tracerProvider,
+		MeterProvider:  meterProvider,
+	}
+
+	// Return the configured providers, cleanup functions, and no error.
 	return provs, func() {
-		cleanup()
+		metricCleanup()
+		traceCleanup()
 	}, nil
 }

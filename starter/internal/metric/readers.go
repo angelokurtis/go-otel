@@ -33,6 +33,10 @@ func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, e
 			return nil, err
 		}
 
+		if reader == nil {
+			continue
+		}
+
 		readers = append(readers, reader)
 	}
 
@@ -81,6 +85,8 @@ func newReader(ctx context.Context, options readerOptions) (metric.Reader, error
 		}
 		// TODO: start listening on :9090/metrics
 		return reader, nil
+	case ExporterNone:
+		return nil, nil
 	default:
 		return nil, fmt.Errorf("unrecognized value for metric exporter: %s", exporter)
 	}

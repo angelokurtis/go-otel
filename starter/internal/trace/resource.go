@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"go.opentelemetry.io/otel/sdk"
 	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 func NewResource(ctx context.Context) (*resource.Resource, error) {
@@ -14,6 +16,11 @@ func NewResource(ctx context.Context) (*resource.Resource, error) {
 		resource.WithOS(),
 		resource.WithContainer(),
 		resource.WithHost(),
+		resource.WithAttributes(
+			semconv.TelemetrySDKName("opentelemetry"),
+			semconv.TelemetrySDKLanguageGo,
+			semconv.TelemetrySDKVersion(sdk.Version()),
+		),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new resource: %w", err)

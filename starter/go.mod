@@ -6,7 +6,6 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-logr/logr v1.3.0
 	github.com/go-logr/stdr v1.2.2
-	github.com/google/wire v0.5.1-0.20220620021424-0675cdc9191c
 	github.com/gotidy/ptr v1.4.0
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/propagators/aws v1.21.1
