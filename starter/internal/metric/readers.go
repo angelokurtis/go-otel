@@ -3,7 +3,6 @@ package metric
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
@@ -11,11 +10,10 @@ import (
 )
 
 type ReadersOptions struct {
-	Exporters      Exporters
-	Endpoint       Endpoint
-	Compression    Compression
-	ExportInterval ExportInterval
-	Protocol       Protocol
+	Exporters   Exporters
+	Endpoint    Endpoint
+	Compression Compression
+	Protocol    Protocol
 }
 
 func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, error) {
@@ -23,11 +21,10 @@ func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, e
 
 	for _, exporter := range options.Exporters {
 		reader, err := newReader(ctx, readerOptions{
-			Exporter:       exporter,
-			Endpoint:       options.Endpoint,
-			Compression:    options.Compression,
-			ExportInterval: options.ExportInterval,
-			Protocol:       options.Protocol,
+			Exporter:    exporter,
+			Endpoint:    options.Endpoint,
+			Compression: options.Compression,
+			Protocol:    options.Protocol,
 		})
 		if err != nil {
 			return nil, err
@@ -44,11 +41,10 @@ func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, e
 }
 
 type readerOptions struct {
-	Exporter       Exporter
-	Endpoint       Endpoint
-	Compression    Compression
-	ExportInterval ExportInterval
-	Protocol       Protocol
+	Exporter    Exporter
+	Endpoint    Endpoint
+	Compression Compression
+	Protocol    Protocol
 }
 
 func newReader(ctx context.Context, options readerOptions) (metric.Reader, error) {
@@ -59,25 +55,18 @@ func newReader(ctx context.Context, options readerOptions) (metric.Reader, error
 			return nil, fmt.Errorf("failed to initialize the Logging Exporter: %w", err)
 		}
 
-		return metric.NewPeriodicReader(
-			exp,
-			metric.WithInterval(time.Duration(options.ExportInterval)),
-		), nil
+		return metric.NewPeriodicReader(exp), nil
 	case ExporterOtlp:
 		exp, err := newOTLPExporter(ctx, otlpExporterOptions{
-			Endpoint:       options.Endpoint,
-			Compression:    options.Compression,
-			ExportInterval: options.ExportInterval,
-			Protocol:       options.Protocol,
+			Endpoint:    options.Endpoint,
+			Compression: options.Compression,
+			Protocol:    options.Protocol,
 		})
 		if err != nil {
 			return nil, err
 		}
 
-		return metric.NewPeriodicReader(
-			exp,
-			metric.WithInterval(time.Duration(options.ExportInterval)),
-		), nil
+		return metric.NewPeriodicReader(exp), nil
 	case ExporterPrometheus:
 		reader, err := prometheus.New()
 		if err != nil {

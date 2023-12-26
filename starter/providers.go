@@ -77,15 +77,13 @@ func StartProviders(ctx context.Context) (*Providers, ShutdownFunc, error) {
 		Propagator:   p,
 		Logger:       log,
 	})
-	exportInterval := env.ToMetricExportInterval(variables)
 
 	// Create metric readers based on environment variables.
 	readers, err := intlmetric.NewReaders(ctx, intlmetric.ReadersOptions{
-		Exporters:      env.ToMetricExporters(variables),
-		Endpoint:       env.ToMetricEndpoint(variables),
-		Compression:    env.ToMetricCompression(variables),
-		ExportInterval: exportInterval,
-		Protocol:       env.ToMetricProtocol(variables),
+		Exporters:   env.ToMetricExporters(variables),
+		Endpoint:    env.ToMetricEndpoint(variables),
+		Compression: env.ToMetricCompression(variables),
+		Protocol:    env.ToMetricProtocol(variables),
 	})
 	if err != nil {
 		traceCleanup()
@@ -94,10 +92,9 @@ func StartProviders(ctx context.Context) (*Providers, ShutdownFunc, error) {
 
 	// Create a MeterProvider with configured options.
 	meterProvider, metricCleanup := intlmetric.NewMeterProvider(ctx, intlmetric.MeterProviderOptions{
-		Resource:       r,
-		Readers:        readers,
-		ExportInterval: exportInterval,
-		Logger:         log,
+		Resource: r,
+		Readers:  readers,
+		Logger:   log,
 	})
 	provs := &Providers{
 		TracerProvider: tracerProvider,
