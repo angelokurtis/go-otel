@@ -10,10 +10,9 @@ import (
 )
 
 type MeterProviderOptions struct {
-	Resource       *resource.Resource
-	Readers        []metric.Reader
-	ExportInterval ExportInterval
-	Logger         logr.Logger
+	Resource *resource.Resource
+	Readers  []metric.Reader
+	Logger   logr.Logger
 }
 
 func NewMeterProvider(ctx context.Context, options MeterProviderOptions) (*metric.MeterProvider, func()) {

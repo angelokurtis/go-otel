@@ -42,11 +42,6 @@ type Variables struct {
 			} `envPrefix:"METRICS_"`
 		} `envPrefix:"EXPORTER_OTLP_"`
 	}
-	Metric struct {
-		Export struct {
-			Interval time.Duration `envDefault:"60s"`
-		} `envPrefix:"METRIC_EXPORT_"`
-	}
 	Propagators []trace.Propagator `envDefault:"tracecontext,baggage"`
 }
 

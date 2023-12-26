@@ -10,25 +10,22 @@ import (
 )
 
 type otlpExporterOptions struct {
-	Endpoint       Endpoint
-	Compression    Compression
-	ExportInterval ExportInterval
-	Protocol       Protocol
+	Endpoint    Endpoint
+	Compression Compression
+	Protocol    Protocol
 }
 
 func newOTLPExporter(ctx context.Context, options otlpExporterOptions) (metric.Exporter, error) {
 	switch exporter := options.Protocol; exporter {
 	case ProtocolGrpc:
 		return newGRPCExporter(ctx, grpcExporterOptions{
-			Endpoint:       options.Endpoint,
-			Compression:    options.Compression,
-			ExportInterval: options.ExportInterval,
+			Endpoint:    options.Endpoint,
+			Compression: options.Compression,
 		})
 	case ProtocolHttpProtobuf:
 		return newHTTPExporter(ctx, httpExporterOptions{
-			Endpoint:       options.Endpoint,
-			Compression:    options.Compression,
-			ExportInterval: options.ExportInterval,
+			Endpoint:    options.Endpoint,
+			Compression: options.Compression,
 		})
 	default:
 		return nil, fmt.Errorf("unrecognized value for metric exporter protocol: %s", exporter)
@@ -36,9 +33,8 @@ func newOTLPExporter(ctx context.Context, options otlpExporterOptions) (metric.E
 }
 
 type grpcExporterOptions struct {
-	Endpoint       Endpoint
-	Compression    Compression
-	ExportInterval ExportInterval
+	Endpoint    Endpoint
+	Compression Compression
 }
 
 func newGRPCExporter(ctx context.Context, options grpcExporterOptions) (metric.Exporter, error) {
@@ -67,9 +63,8 @@ func newGRPCExporter(ctx context.Context, options grpcExporterOptions) (metric.E
 }
 
 type httpExporterOptions struct {
-	Endpoint       Endpoint
-	Compression    Compression
-	ExportInterval ExportInterval
+	Endpoint    Endpoint
+	Compression Compression
 }
 
 func newHTTPExporter(ctx context.Context, options httpExporterOptions) (metric.Exporter, error) {
