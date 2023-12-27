@@ -51,9 +51,6 @@ func newGRPCExporter(ctx context.Context, options grpcExporterOptions) (metric.E
 		opts = append(opts, otlpmetricgrpc.WithInsecure())
 	}
 
-	// TODO: add config for "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE"
-	// TODO: add config for "OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION"
-
 	exp, err := otlpmetricgrpc.New(ctx, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize the OTLP/gRPC Exporter: %w", err)
@@ -86,9 +83,6 @@ func newHTTPExporter(ctx context.Context, options httpExporterOptions) (metric.E
 	if endpoint.Scheme != "https" {
 		opts = append(opts, otlpmetrichttp.WithInsecure())
 	}
-
-	// TODO: add config for "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE"
-	// TODO: add config for "OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION"
 
 	exp, err := otlpmetrichttp.New(ctx, opts...)
 	if err != nil {
