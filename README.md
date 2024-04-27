@@ -1,47 +1,27 @@
 # go-otel
 
-**go-otel** is a Go library that simplifies the configuration of OpenTelemetry by relying on environment
-variables. It draws inspiration from the OpenTelemetry Autoconfigure Java SDK and allows users to configure various
-aspects of OpenTelemetry instrumentation seamlessly using environment variables.
+`go-otel` is a collection of libraries designed to facilitate the integration of OpenTelemetry into Go applications.
+This project addresses the need for streamlined observability tools in Go, offering functionalities similar to those
+available for auto-instrumentation in other languages, such as Java. Our goal is to minimize setup complexity and
+provide easy access to advanced observability features with minimal configuration.
 
-## Overview
+## Libraries Overview
 
-OpenTelemetry is an observability framework that provides APIs, libraries, agents, and instrumentation to provide
-observability for applications. go-otel aims to streamline the setup process by allowing users to configure
-OpenTelemetry using environment variables. This is particularly useful for projects where configuration through code or
-configuration files may be cumbersome or less flexible.
+- **[starter](starter)**: Simplifies the configuration of OpenTelemetry tracing and metrics through environment
+  variables, enabling nearly automatic instrumentation.
+- **[span](span)**: Offers a simplified interface for managing span operations, enhancing the ease of logging and
+  manipulating span data.
 
-## Features
+## Quick Start
 
-- **Environment Variable Based Configuration:** Configure OpenTelemetry settings using environment variables, following
-  the conventions defined in the OpenTelemetry Autoconfigure Java SDK.
+### Requirements
 
-- **Seamless Integration:** Easily integrate OpenTelemetry into your Go applications without the need for extensive code
-  modifications.
+- Go version 1.21 or newer
+- Docker (optional, for running specific examples or tests)
 
-## Getting Started
+### Basic Usage
 
-### Prerequisites
-
-Make sure you have Go installed on your system.
-
-### Installation
-
-To install go-otel, use the following Go module command:
-
-```bash
-go get github.com/angelokurtis/go-otel
-```
-
-### Usage
-
-1. Import the `go-otel` package into your Go code:
-
-    ```go
-    import "github.com/angelokurtis/go-otel"
-    ```
-
-2. Initialize OpenTelemetry with environment variable-based configuration:
+1. Initialize OpenTelemetry using environment variable-based configuration:
 
     ```go
     package main
@@ -56,10 +36,10 @@ go get github.com/angelokurtis/go-otel
     )
     
     func main() {
-        // Initialize OpenTelemetry with environment variables
+        // Initialize OpenTelemetry based on environment variables
         _, shutdown, err := starter.StartProviders(context.Background())
         if err != nil {
-            log.Fatalf("Error initializing OpenTelemetry: %v", err)
+            log.Fatalf("Failed to initialize OpenTelemetry: %v", err)
         }
         defer shutdown()
     
@@ -69,8 +49,8 @@ go get github.com/angelokurtis/go-otel
             ctx, end := span.Start(ctx)
             defer end()
     
-            // Your application code here
-    
+            // Place your application code here
+
             w.Write([]byte("Hello, World!"))
         })
     
@@ -78,22 +58,24 @@ go get github.com/angelokurtis/go-otel
     }
     ```
 
-3. Set the required environment variables based on the configuration options described in
+2. Set the necessary environment variables as detailed in
    the [OpenTelemetry Autoconfigure Java SDK README](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md).
 
-4. Run your Go application, and OpenTelemetry will be configured based on the provided environment variables.
+3. Execute your Go application. OpenTelemetry will configure itself based on the specified environment variables.
+
+Explore the `/_examples` directory for detailed guides on using each library.
 
 ## Configuration Options
 
-The configuration options for go-otel are aligned with the environment variables specified in
+Configuration aligns with the environment variables specified in
 the [OpenTelemetry Autoconfigure Java SDK README](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md).
-Refer to that documentation for a comprehensive list of available options.
+Refer to this document for a detailed list of configuration options.
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or pull requests on
-the [GitHub repository](https://github.com/angelokurtis/go-otel).
+We welcome contributions! Please feel free to submit issues or pull requests on
+our [GitHub repository](https://github.com/angelokurtis/go-otel).
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0. For details, see the [LICENSE](LICENSE) file.
