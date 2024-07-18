@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	env "github.com/caarlos0/env/v10"
+	env "github.com/caarlos0/env/v11"
 
 	"github.com/angelokurtis/go-otel/starter/internal/metric"
 	"github.com/angelokurtis/go-otel/starter/internal/trace"
