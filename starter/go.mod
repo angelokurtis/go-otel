@@ -3,7 +3,7 @@ module github.com/angelokurtis/go-otel/starter
 go 1.21
 
 require (
-	github.com/caarlos0/env/v11 v11.1.0
+	github.com/caarlos0/env/v11 v11.2.2
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/stdr v1.2.2
 	github.com/gotidy/ptr v1.4.0
