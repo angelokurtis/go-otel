@@ -41,6 +41,11 @@ type Variables struct {
 				Compression *metric.Compression
 			} `envPrefix:"METRICS_"`
 		} `envPrefix:"EXPORTER_OTLP_"`
+		Prometheus struct {
+			Host metric.PrometheusHost `envDefault:"0.0.0.0"`
+			Port metric.PrometheusPort `envDefault:"9464"`
+			Path metric.PrometheusPath `envDefault:"/metrics"`
+		}
 	}
 	Propagators []trace.Propagator `envDefault:"tracecontext,baggage"`
 }

@@ -23,3 +23,12 @@ type Exporter string
 // Protocol defines the encoding of telemetry data and the protocol used to exchange metric data between the client and the server.
 // ENUM(grpc, http/protobuf)
 type Protocol string
+
+// PrometheusHost defines the hostname or IP address where metrics are published.
+type PrometheusHost string
+
+// PrometheusPort specifies the port on which metrics are published.
+type PrometheusPort uint
+
+// PrometheusPath specifies the URL path where Prometheus scrapes the published metrics from.
+type PrometheusPath string
