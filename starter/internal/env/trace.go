@@ -6,7 +6,11 @@ import (
 	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
-func ToTraceExporters(otel *Variables) trace.Exporters {
+func ToTraceExporters(otel *Variables, provider ExporterProvider) trace.Exporters {
+	if exporters, ok := provider.TraceExporters(); ok {
+		return exporters
+	}
+
 	return otel.Traces.Exporter
 }
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/angelokurtis/go-otel/starter/_test"
 	"github.com/angelokurtis/go-otel/starter/internal/env"
+	"github.com/angelokurtis/go-otel/starter/internal/metric"
 	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
@@ -18,7 +19,7 @@ func TestTrace_TracesExporter(t *testing.T) {
 		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		exporters := env.ToTraceExporters(variables)
+		exporters := env.ToTraceExporters(variables, new(fakeExporterProvider))
 		assert.Equal(t, trace.Exporters{trace.ExporterOtlp}, exporters)
 	})
 	t.Run("it should correctly identify the specified trace exporters", func(t *testing.T) {
@@ -31,7 +32,7 @@ func TestTrace_TracesExporter(t *testing.T) {
 		variables, err := env.LookupVariables()
 		require.NoError(t, err)
 
-		exporters := env.ToTraceExporters(variables)
+		exporters := env.ToTraceExporters(variables, new(fakeExporterProvider))
 		assert.Equal(t, trace.Exporters{trace.ExporterLogging, trace.ExporterZipkin}, exporters)
 	})
 }
@@ -184,4 +185,14 @@ func TestTrace_ExporterOTLPTracesCompression(t *testing.T) {
 		compression := env.ToTraceCompression(variables)
 		assert.Equal(t, trace.CompressionNone, compression)
 	})
+}
+
+type fakeExporterProvider struct{}
+
+func (f *fakeExporterProvider) TraceExporters() (trace.Exporters, bool) {
+	return nil, false
+}
+
+func (f *fakeExporterProvider) MetricExporters() (metric.Exporters, bool) {
+	return nil, false
 }
