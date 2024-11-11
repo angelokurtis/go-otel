@@ -13,7 +13,7 @@ import (
 	intltrace "github.com/angelokurtis/go-otel/starter/internal/trace"
 )
 
-// Providers struct holds the TracerProvider for OpenTelemetry.
+// Providers holds tracing and metrics providers for OpenTelemetry.
 type Providers struct {
 	TracerProvider *trace.TracerProvider
 	MeterProvider  *metric.MeterProvider
@@ -23,87 +23,97 @@ type ShutdownFunc func()
 
 // StartProviders initializes and configures OpenTelemetry providers.
 // It returns a Providers struct containing the TracerProvider, a shutdown function, and an error if setup fails.
-func StartProviders(ctx context.Context) (*Providers, ShutdownFunc, error) {
-	// Create a new OpenTelemetry resource.
-	r, err := intltrace.NewResource(ctx)
+func StartProviders(ctx context.Context, opts ...func(c *option)) (*Providers, ShutdownFunc, error) {
+	// Apply any configuration options
+	options := newOption(opts...)
+
+	// Create a resource to label all telemetry data
+	resource, err := intltrace.NewResource(ctx, options)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Lookup environment variables related to OpenTelemetry configuration.
+	// Load environment variables for configuration
 	variables, err := env.LookupVariables()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Create a sampler based on environment variables.
-	s, err := intltrace.NewSampler(intltrace.SamplerOptions{
+	// Set up a trace sampler (controls what traces are captured)
+	sampler, err := intltrace.NewSampler(intltrace.SamplerOptions{
 		Sampler:    env.ToTraceSampler(variables),
 		SamplerArg: env.ToTraceSamplerArg(variables),
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Create a client for exporting traces based on environment variables.
-	c, err := intltrace.NewClient(intltrace.ClientOptions{
+	// Set up a trace client for exporting traces
+	traceClient, err := intltrace.NewClient(intltrace.ClientOptions{
 		Protocol:    env.ToTraceProtocol(variables),
 		Endpoint:    env.ToTraceEndpoint(variables),
 		Compression: env.ToTraceCompression(variables),
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Create span exporters based on environment variables.
-	se, err := intltrace.NewSpanExporters(ctx, intltrace.SpanExportersOptions{
-		Exporters: env.ToTraceExporters(variables),
-		Client:    c,
+	// Configure trace exporters for sending traces out
+	spanExporters, err := intltrace.NewSpanExporters(ctx, intltrace.SpanExportersOptions{
+		Exporters: env.ToTraceExporters(variables, options),
+		Client:    traceClient,
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Create a logger for tracing and metrics.
-	log := logger.New()
+	// Initialize a logger for tracing and metrics
+	traceLogger := logger.New()
 
-	// Create a TracerProvider with configured options.
-	p := intltrace.NewTextMapPropagator(env.ToTracePropagators(variables))
-	tracerProvider, traceCleanup := intltrace.NewTracerProvider(ctx, intltrace.TracerProviderOptions{
-		Resource:     r,
-		Sampler:      s,
-		Exporters:    se,
+	// Set up the TracerProvider to manage traces
+	propagator := intltrace.NewTextMapPropagator(env.ToTracePropagators(variables))
+	tracerProvider, tracerCleanup := intltrace.NewTracerProvider(ctx, intltrace.TracerProviderOptions{
+		Resource:     resource,
+		Sampler:      sampler,
+		Exporters:    spanExporters,
 		BatchTimeout: env.ToTraceTimeout(variables),
-		Propagator:   p,
-		Logger:       log,
+		Propagator:   propagator,
+		Logger:       traceLogger,
 	})
 
-	// Create metric readers based on environment variables.
-	readers, err := intlmetric.NewReaders(ctx, intlmetric.ReadersOptions{
-		Exporters:   env.ToMetricExporters(variables),
-		Endpoint:    env.ToMetricEndpoint(variables),
-		Compression: env.ToMetricCompression(variables),
-		Protocol:    env.ToMetricProtocol(variables),
+	// Configure metric readers for gathering metrics
+	metricReaders, readersCleanup, err := intlmetric.NewReaders(ctx, intlmetric.ReadersOptions{
+		Exporters:        env.ToMetricExporters(variables, options),
+		Endpoint:         env.ToMetricEndpoint(variables),
+		Compression:      env.ToMetricCompression(variables),
+		Protocol:         env.ToMetricProtocol(variables),
+		RegistryProvider: options,
+		PrometheusHost:   env.ToMetricPrometheusHost(variables),
+		PrometheusPort:   env.ToMetricPrometheusPort(variables),
+		PrometheusPath:   env.ToMetricPrometheusPath(variables),
 	})
 	if err != nil {
-		traceCleanup()
-		return nil, nil, fmt.Errorf("failed to set up OpenTelemetry providers: %w", err)
+		tracerCleanup()
+		return nil, nil, fmt.Errorf("OpenTelemetry setup failed: %w", err)
 	}
 
-	// Create a MeterProvider with configured options.
-	meterProvider, metricCleanup := intlmetric.NewMeterProvider(ctx, intlmetric.MeterProviderOptions{
-		Resource: r,
-		Readers:  readers,
-		Logger:   log,
+	// Set up the MeterProvider to manage metrics
+	meterProvider, meterCleanup := intlmetric.NewMeterProvider(ctx, intlmetric.MeterProviderOptions{
+		Resource: resource,
+		Readers:  metricReaders,
+		Logger:   traceLogger,
 	})
-	provs := &Providers{
+
+	// Combine providers into a struct for easy access
+	providers := &Providers{
 		TracerProvider: tracerProvider,
 		MeterProvider:  meterProvider,
 	}
 
-	// Return the configured providers, cleanup functions, and no error.
-	return provs, func() {
-		metricCleanup()
-		traceCleanup()
+	// Return providers, a cleanup function, and no error
+	return providers, func() {
+		meterCleanup()
+		readersCleanup()
+		tracerCleanup()
 	}, nil
 }
