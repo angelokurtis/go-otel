@@ -12,20 +12,20 @@ import (
 )
 
 type PrometheusServer struct {
-	registry *prometheus.Registry
+	gatherer prometheus.Gatherer
 	host     PrometheusHost
 	port     PrometheusPort
 	path     PrometheusPath
 }
 
-func NewPrometheusServer(registry *prometheus.Registry, host PrometheusHost, port PrometheusPort, path PrometheusPath) (*PrometheusServer, error) {
+func NewPrometheusServer(gatherer prometheus.Gatherer, host PrometheusHost, port PrometheusPort, path PrometheusPath) (*PrometheusServer, error) {
 	// Validate port range
 	if port < 0 || port > 65535 {
 		return nil, errors.New("invalid port: must be between 0 and 65535")
 	}
 
 	// Initialize and return the exporter
-	return &PrometheusServer{registry: registry, host: host, port: port, path: path}, nil
+	return &PrometheusServer{gatherer: gatherer, host: host, port: port, path: path}, nil
 }
 
 func (ps *PrometheusServer) Addr() string {
@@ -67,5 +67,5 @@ func (ps *PrometheusServer) Start(ctx context.Context) (func(), error) {
 }
 
 func (ps *PrometheusServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	promhttp.HandlerFor(ps.registry, promhttp.HandlerOpts{}).ServeHTTP(w, req)
+	promhttp.HandlerFor(ps.gatherer, promhttp.HandlerOpts{}).ServeHTTP(w, req)
 }
