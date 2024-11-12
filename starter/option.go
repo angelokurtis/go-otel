@@ -9,10 +9,11 @@ import (
 )
 
 type option struct {
-	serviceName        *string
-	traceExporters     *intltrace.Exporters
-	metricExporters    *intlmetric.Exporters
-	prometheusRegistry *prometheus.Registry
+	serviceName          *string
+	traceExporters       *intltrace.Exporters
+	metricExporters      *intlmetric.Exporters
+	prometheusGatherer   prometheus.Gatherer
+	prometheusRegisterer prometheus.Registerer
 }
 
 func newOption(opts ...func(c *option)) *option {
@@ -36,8 +37,12 @@ func (o *option) MetricExporters() (intlmetric.Exporters, bool) {
 	return ptr.To(o.metricExporters), o.metricExporters != nil
 }
 
-func (o *option) PrometheusRegistry() (*prometheus.Registry, bool) {
-	return o.prometheusRegistry, o.prometheusRegistry != nil
+func (o *option) PrometheusGatherer() (prometheus.Gatherer, bool) {
+	return o.prometheusGatherer, o.prometheusGatherer != nil
+}
+
+func (o *option) PrometheusRegisterer() (prometheus.Registerer, bool) {
+	return o.prometheusRegisterer, o.prometheusRegisterer != nil
 }
 
 func WithServiceName(serviceName string) func(opt *option) {
@@ -62,8 +67,14 @@ func WithMetricsExporter(exporter intlmetric.Exporter) func(opt *option) {
 	}
 }
 
-func WithPrometheusRegistry(promRegistry *prometheus.Registry) func(opt *option) {
+func WithPrometheusGatherer(gatherer prometheus.Gatherer) func(opt *option) {
 	return func(opt *option) {
-		opt.prometheusRegistry = promRegistry
+		opt.prometheusGatherer = gatherer
+	}
+}
+
+func WithPrometheusRegisterer(registerer prometheus.Registerer) func(opt *option) {
+	return func(opt *option) {
+		opt.prometheusRegisterer = registerer
 	}
 }
