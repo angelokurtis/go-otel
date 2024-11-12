@@ -83,14 +83,14 @@ func StartProviders(ctx context.Context, opts ...func(c *option)) (*Providers, S
 
 	// Configure metric readers for gathering metrics
 	metricReaders, readersCleanup, err := intlmetric.NewReaders(ctx, intlmetric.ReadersOptions{
-		Exporters:        env.ToMetricExporters(variables, options),
-		Endpoint:         env.ToMetricEndpoint(variables),
-		Compression:      env.ToMetricCompression(variables),
-		Protocol:         env.ToMetricProtocol(variables),
-		RegistryProvider: options,
-		PrometheusHost:   env.ToMetricPrometheusHost(variables),
-		PrometheusPort:   env.ToMetricPrometheusPort(variables),
-		PrometheusPath:   env.ToMetricPrometheusPath(variables),
+		Exporters:          env.ToMetricExporters(variables, options),
+		Endpoint:           env.ToMetricEndpoint(variables),
+		Compression:        env.ToMetricCompression(variables),
+		Protocol:           env.ToMetricProtocol(variables),
+		PrometheusProvider: options,
+		PrometheusHost:     env.ToMetricPrometheusHost(variables),
+		PrometheusPort:     env.ToMetricPrometheusPort(variables),
+		PrometheusPath:     env.ToMetricPrometheusPath(variables),
 	})
 	if err != nil {
 		tracerCleanup()
