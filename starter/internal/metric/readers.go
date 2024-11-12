@@ -17,7 +17,7 @@ type ReadersOptions struct {
 	Compression Compression
 	Protocol    Protocol
 
-	RegistryProvider RegistryProvider
+	PrometheusProvider PrometheusProvider
 
 	PrometheusHost PrometheusHost
 	PrometheusPort PrometheusPort
@@ -33,14 +33,14 @@ func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, f
 	// Iterate over each exporter to create corresponding readers
 	for _, exporter := range options.Exporters {
 		reader, shutdown, err := newReader(ctx, readerOptions{
-			Exporter:         exporter,
-			Endpoint:         options.Endpoint,
-			Compression:      options.Compression,
-			Protocol:         options.Protocol,
-			RegistryProvider: options.RegistryProvider,
-			PrometheusHost:   options.PrometheusHost,
-			PrometheusPort:   options.PrometheusPort,
-			PrometheusPath:   options.PrometheusPath,
+			Exporter:           exporter,
+			Endpoint:           options.Endpoint,
+			Compression:        options.Compression,
+			Protocol:           options.Protocol,
+			PrometheusProvider: options.PrometheusProvider,
+			PrometheusHost:     options.PrometheusHost,
+			PrometheusPort:     options.PrometheusPort,
+			PrometheusPath:     options.PrometheusPath,
 		})
 		if err != nil {
 			return nil, func() {
@@ -65,8 +65,9 @@ func NewReaders(ctx context.Context, options ReadersOptions) ([]metric.Reader, f
 	}, nil
 }
 
-type RegistryProvider interface {
-	PrometheusRegistry() (*prometheus.Registry, bool)
+type PrometheusProvider interface {
+	PrometheusGatherer() (prometheus.Gatherer, bool)
+	PrometheusRegisterer() (prometheus.Registerer, bool)
 }
 
 // readerOptions contains the configuration for a single reader
@@ -76,7 +77,7 @@ type readerOptions struct {
 	Compression Compression
 	Protocol    Protocol
 
-	RegistryProvider RegistryProvider
+	PrometheusProvider PrometheusProvider
 
 	PrometheusHost PrometheusHost
 	PrometheusPort PrometheusPort
@@ -108,17 +109,25 @@ func newReader(ctx context.Context, options readerOptions) (metric.Reader, func(
 		return metric.NewPeriodicReader(exp), func() {}, nil
 	case ExporterPrometheus:
 		// Create a Prometheus exporter and return the reader with a shutdown function
-		registry := prometheus.NewRegistry()
+		registerer := prometheus.DefaultRegisterer
+		if reg, ok := options.PrometheusProvider.PrometheusRegisterer(); ok {
+			registerer = reg
+		}
 
 		reader, err := otelprom.New(
-			otelprom.WithRegisterer(registry),
+			otelprom.WithRegisterer(registerer),
 		)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to initialize the Prometheus Exporter: %w", err)
 		}
 
+		gatherer := prometheus.DefaultGatherer
+		if gath, ok := options.PrometheusProvider.PrometheusGatherer(); ok {
+			gatherer = gath
+		}
+
 		exp, err := NewPrometheusServer(
-			registry,
+			gatherer,
 			options.PrometheusHost,
 			options.PrometheusPort,
 			options.PrometheusPath,
