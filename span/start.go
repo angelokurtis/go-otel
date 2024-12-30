@@ -11,7 +11,7 @@ import (
 
 const (
 	libraryName    = "github.com/angelokurtis/go-otel/span"
-	libraryVersion = "1.0.0"
+	libraryVersion = "v1.2.3"
 )
 
 // EndFunc is a function type that can be used to end an OpenTelemetry span.
