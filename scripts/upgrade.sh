@@ -3,6 +3,7 @@
 set -e
 
 run_part1() {
+  export GOTOOLCHAIN=local
   set -x
   cd ./span/
   rm -rf go.mod go.sum
@@ -13,6 +14,7 @@ run_part1() {
 }
 
 run_part2() {
+  export GOTOOLCHAIN=local
   set -x
   cd ./starter/
   rm -rf go.mod go.sum
@@ -37,7 +39,7 @@ run_part2() {
   go get go.opentelemetry.io/otel/exporters/stdout/stdoutmetric@latest
   go get go.opentelemetry.io/otel/sdk@latest
   go get go.opentelemetry.io/otel/sdk/metric@latest
-  GOTOOLCHAIN=local go mod tidy
+  go mod tidy
 }
 
 run_part1 &
