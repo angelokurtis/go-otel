@@ -42,6 +42,9 @@ run_part2() {
   go mod tidy
 }
 
+export GOTOOLCHAIN=local
+rm -rf go.mod go.sum
+go mod init github.com/angelokurtis/go-otel
 run_part1 &
 run_part2 &
 
