@@ -10,6 +10,7 @@ import (
 
 	"github.com/angelokurtis/go-otel/starter/_test"
 	"github.com/angelokurtis/go-otel/starter/internal/env"
+	"github.com/angelokurtis/go-otel/starter/internal/logs"
 	"github.com/angelokurtis/go-otel/starter/internal/metric"
 	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
@@ -194,5 +195,9 @@ func (f *fakeExporterProvider) TraceExporters() (trace.Exporters, bool) {
 }
 
 func (f *fakeExporterProvider) MetricExporters() (metric.Exporters, bool) {
+	return nil, false
+}
+
+func (f *fakeExporterProvider) LogExporters() (logs.Exporters, bool) {
 	return nil, false
 }
