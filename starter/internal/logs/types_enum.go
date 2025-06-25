@@ -4,7 +4,7 @@
 // Build Date: 2025-06-17T15:19:50Z
 // Built By: goreleaser
 
-package metric
+package logs
 
 import (
 	"errors"
@@ -55,10 +55,8 @@ const (
 	ExporterOtlp Exporter = "otlp"
 	// ExporterNone is a Exporter of type none.
 	ExporterNone Exporter = "none"
-	// ExporterPrometheus is a Exporter of type prometheus.
-	ExporterPrometheus Exporter = "prometheus"
-	// ExporterLogging is a Exporter of type logging.
-	ExporterLogging Exporter = "logging"
+	// ExporterConsole is a Exporter of type console.
+	ExporterConsole Exporter = "console"
 )
 
 var ErrInvalidExporter = errors.New("not a valid Exporter")
@@ -76,10 +74,9 @@ func (x Exporter) IsValid() bool {
 }
 
 var _ExporterValue = map[string]Exporter{
-	"otlp":       ExporterOtlp,
-	"none":       ExporterNone,
-	"prometheus": ExporterPrometheus,
-	"logging":    ExporterLogging,
+	"otlp":    ExporterOtlp,
+	"none":    ExporterNone,
+	"console": ExporterConsole,
 }
 
 // ParseExporter attempts to convert a string to a Exporter.
