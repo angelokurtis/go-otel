@@ -4,6 +4,7 @@ import (
 	"github.com/gotidy/ptr"
 	"github.com/prometheus/client_golang/prometheus"
 
+	intllogs "github.com/angelokurtis/go-otel/starter/internal/logs"
 	intlmetric "github.com/angelokurtis/go-otel/starter/internal/metric"
 	intltrace "github.com/angelokurtis/go-otel/starter/internal/trace"
 )
@@ -12,6 +13,7 @@ type option struct {
 	serviceName          *string
 	traceExporters       *intltrace.Exporters
 	metricExporters      *intlmetric.Exporters
+	logExporters         *intllogs.Exporters
 	prometheusGatherer   prometheus.Gatherer
 	prometheusRegisterer prometheus.Registerer
 }
@@ -35,6 +37,10 @@ func (o *option) TraceExporters() (intltrace.Exporters, bool) {
 
 func (o *option) MetricExporters() (intlmetric.Exporters, bool) {
 	return ptr.To(o.metricExporters), o.metricExporters != nil
+}
+
+func (o *option) LogExporters() (intllogs.Exporters, bool) {
+	return ptr.To(o.logExporters), o.logExporters != nil
 }
 
 func (o *option) PrometheusGatherer() (prometheus.Gatherer, bool) {
@@ -64,6 +70,14 @@ func WithMetricsExporter(exporter intlmetric.Exporter) func(opt *option) {
 		exporters := ptr.ToDef(opt.metricExporters, make(intlmetric.Exporters, 0))
 		exporters = append(exporters, exporter)
 		opt.metricExporters = ptr.Of(exporters)
+	}
+}
+
+func WithLogsExporter(exporter intllogs.Exporter) func(opt *option) {
+	return func(opt *option) {
+		exporters := ptr.ToDef(opt.logExporters, make(intllogs.Exporters, 0))
+		exporters = append(exporters, exporter)
+		opt.logExporters = ptr.Of(exporters)
 	}
 }
 
