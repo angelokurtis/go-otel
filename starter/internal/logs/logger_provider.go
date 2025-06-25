@@ -6,7 +6,6 @@ import (
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
 	"go.opentelemetry.io/otel/sdk/log"
-	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
@@ -20,17 +19,17 @@ type LoggerProviderOptions struct {
 	Logger             logr.Logger
 }
 
-func NewLoggerProvider(ctx context.Context, options LoggerProviderOptions) (*sdklog.LoggerProvider, func(), error) {
-	opts := []sdklog.LoggerProviderOption{
-		sdklog.WithResource(options.Resource),
+func NewLoggerProvider(ctx context.Context, options LoggerProviderOptions) (*log.LoggerProvider, func(), error) {
+	opts := []log.LoggerProviderOption{
+		log.WithResource(options.Resource),
 	}
 
 	for _, exporter := range options.Exporters {
-		var processor sdklog.Processor
+		var processor log.Processor
 
 		switch exp := exporter.(type) {
 		case *stdoutlog.Exporter:
-			processor = sdklog.NewSimpleProcessor(exp)
+			processor = log.NewSimpleProcessor(exp)
 		default:
 			processor = newBatchProcessor(ctx, batchProcessorOptions{
 				Exporter:           exporter,
@@ -41,10 +40,10 @@ func NewLoggerProvider(ctx context.Context, options LoggerProviderOptions) (*sdk
 			})
 		}
 
-		opts = append(opts, sdklog.WithProcessor(processor))
+		opts = append(opts, log.WithProcessor(processor))
 	}
 
-	prov := sdklog.NewLoggerProvider(opts...)
+	prov := log.NewLoggerProvider(opts...)
 
 	cleanup := func() {
 		if err := prov.Shutdown(ctx); err != nil {
