@@ -7,6 +7,7 @@ import (
 
 	env "github.com/caarlos0/env/v11"
 
+	"github.com/angelokurtis/go-otel/starter/internal/logs"
 	"github.com/angelokurtis/go-otel/starter/internal/metric"
 	"github.com/angelokurtis/go-otel/starter/internal/trace"
 )
@@ -22,6 +23,9 @@ type Variables struct {
 	Metrics struct {
 		Exporter []metric.Exporter `envDefault:"otlp"`
 	} `envPrefix:"METRICS_"`
+	Logs struct {
+		Exporter []logs.Exporter `envDefault:"otlp"`
+	} `envPrefix:"LOGS_"`
 	Exporter struct {
 		OTLP struct {
 			Endpoint    url.URL       `envDefault:"http://localhost:4317"`
@@ -40,6 +44,12 @@ type Variables struct {
 				Protocol    *metric.Protocol
 				Compression *metric.Compression
 			} `envPrefix:"METRICS_"`
+			Logs struct {
+				Endpoint    *url.URL
+				Timeout     *time.Duration
+				Protocol    *logs.Protocol
+				Compression *logs.Compression
+			} `envPrefix:"LOGS_"`
 		} `envPrefix:"EXPORTER_OTLP_"`
 		Prometheus struct {
 			Host metric.PrometheusHost `envDefault:"0.0.0.0"`
@@ -47,7 +57,13 @@ type Variables struct {
 			Path metric.PrometheusPath `envDefault:"/metrics"`
 		}
 	}
-	Propagators []trace.Propagator `envDefault:"tracecontext,baggage"`
+	Propagators             []trace.Propagator `envDefault:"tracecontext,baggage"`
+	BatchLogRecordProcessor struct {
+		ScheduleDelay      time.Duration `envDefault:"1s"`
+		ExportTimeout      time.Duration `envDefault:"30s"`
+		MaxQueueSize       int           `envDefault:"2048"`
+		MaxExportBatchSize int           `envDefault:"512"`
+	} `envPrefix:"BLRP_"`
 }
 
 // LookupVariables takes advantage of the `envconfig` package to parse environment variables into the Variables struct.
