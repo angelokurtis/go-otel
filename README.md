@@ -2,8 +2,8 @@
 
 `go-otel` is a collection of libraries designed to facilitate the integration of OpenTelemetry into Go applications.
 This project addresses the need for streamlined observability tools in Go, offering functionalities similar to those
-available for auto-instrumentation in other languages, such as Java. Our goal is to minimize setup complexity and
-provide easy access to advanced observability features with minimal configuration.
+available for auto-instrumentation in other languages. Our goal is to minimize setup complexity and provide easy access
+to advanced observability features with minimal configuration.
 
 ## Libraries Overview
 
@@ -21,55 +21,77 @@ provide easy access to advanced observability features with minimal configuratio
 
 ### Basic Usage
 
-1. Initialize OpenTelemetry using environment variable-based configuration:
+```go
+package main
 
-    ```go
-    package main
-    
-    import (
-        "context"
-        "log"
-        "net/http"
-    
-        "github.com/angelokurtis/go-otel/span"
-        "github.com/angelokurtis/go-otel/starter"
-    )
-    
-    func main() {
-        // Initialize OpenTelemetry based on environment variables
-        _, shutdown, err := starter.StartProviders(context.Background())
-        if err != nil {
-            log.Fatalf("Failed to initialize OpenTelemetry: %v", err)
-        }
-        defer shutdown()
-    
-        // Example HTTP server
-        http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-            ctx := r.Context()
-            ctx, end := span.Start(ctx)
-            defer end()
-    
-            // Place your application code here
+import (
+	"context"
+	"log"
+	"net/http"
 
-            w.Write([]byte("Hello, World!"))
-        })
-    
-        log.Fatal(http.ListenAndServe(":8080", nil))
-    }
-    ```
+	"github.com/angelokurtis/go-otel/span"
+	"github.com/angelokurtis/go-otel/starter"
+)
 
-2. Set the necessary environment variables as detailed in
-   the [OpenTelemetry Autoconfigure Java SDK README](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md).
+func main() {
+	// Initialize OpenTelemetry based on environment variables
+	_, shutdown, err := starter.StartProviders(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to initialize OpenTelemetry: %v", err)
+	}
+	defer shutdown()
 
-3. Execute your Go application. OpenTelemetry will configure itself based on the specified environment variables.
+	// Example HTTP server
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		ctx, end := span.Start(ctx)
+		defer end()
 
-Explore the `/_examples` directory for detailed guides on using each library.
+		// Place your application code here
+
+		w.Write([]byte("Hello, World!"))
+	})
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+```
+
+Set the necessary environment variables listed below, then run your Go application. OpenTelemetry will configure itself
+automatically.
 
 ## Configuration Options
 
-Configuration aligns with the environment variables specified in
-the [OpenTelemetry Autoconfigure Java SDK README](https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk-extensions/autoconfigure/README.md).
-Refer to this document for a detailed list of configuration options.
+| Environment Variable                     | Description                                                           | Default                 |
+|------------------------------------------|-----------------------------------------------------------------------|-------------------------|
+| `OTEL_TRACES_EXPORTER`                   | Exporter for traces (`otlp`, `jaeger`, `zipkin`, `logging`)           | `otlp`                  |
+| `OTEL_METRICS_EXPORTER`                  | Exporter for metrics (`none`, `otlp`, `prometheus`)                   | `none`                  |
+| `OTEL_LOGS_EXPORTER`                     | Exporter for logs (`none`, `otlp`)                                    | `none`                  |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`            | Unified endpoint for all signals                                      | `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`            | Transport protocol (`grpc`, `http/protobuf`)                          | `grpc`                  |
+| `OTEL_EXPORTER_OTLP_TIMEOUT`             | Timeout for all signal exports                                        | `10s`                   |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`     | Endpoint for trace requests                                           | `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL`     | Protocol for trace requests                                           | `grpc`                  |
+| `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`      | Timeout for trace requests                                            | `10s`                   |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`    | Endpoint for metric requests                                          | `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL`    | Protocol for metric requests                                          | `grpc`                  |
+| `OTEL_EXPORTER_OTLP_METRICS_TIMEOUT`     | Timeout for metric requests                                           | `10s`                   |
+| `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`       | Endpoint for log requests                                             | `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_LOGS_PROTOCOL`       | Protocol for log requests                                             | `grpc`                  |
+| `OTEL_EXPORTER_OTLP_LOGS_TIMEOUT`        | Timeout for log requests                                              | `10s`                   |
+| `OTEL_EXPORTER_PROMETHEUS_HOST`          | Host to bind Prometheus server                                        | `0.0.0.0`               |
+| `OTEL_EXPORTER_PROMETHEUS_PORT`          | Port for Prometheus server                                            | `9464`                  |
+| `OTEL_EXPORTER_PROMETHEUS_PATH`          | Prometheus metrics path                                               | `/metrics`              |
+| `OTEL_BLRP_EXPORT_TIMEOUT`               | Max time to export data                                               | `30s`                   |
+| `OTEL_BLRP_SCHEDULE_DELAY`               | Delay between exports                                                 | `5s`                    |
+| `OTEL_BLRP_MAX_QUEUE_SIZE`               | Max queued spans                                                      | `2048`                  |
+| `OTEL_BLRP_MAX_EXPORT_BATCH_SIZE`        | Max spans in a batch                                                  | `512`                   |
+| `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION`  | Compression for trace requests                                        | `gzip`                  |
+| `OTEL_EXPORTER_OTLP_METRICS_COMPRESSION` | Compression for metric requests                                       | `gzip`                  |
+| `OTEL_EXPORTER_OTLP_LOGS_COMPRESSION`    | Compression for log requests                                          | `gzip`                  |
+| `OTEL_EXPORTER_OTLP_COMPRESSION`         | Compression type (`gzip`, etc)                                        | `gzip`                  |
+| `OTEL_PROPAGATORS`                       | Comma-separated list of propagators (`tracecontext`, `baggage`, `b3`) | `tracecontext,baggage`  |
+| `OTEL_TRACES_SAMPLER`                    | Sampler type (`always_on`, `parentbased_traceidratio`)                | `parentbased_always_on` |
+| `OTEL_TRACES_SAMPLER_ARG`                | Sampler argument (e.g., `0.25` for 25% sampling)                      | -                       |
 
 ## Contributing
 
