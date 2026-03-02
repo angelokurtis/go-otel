@@ -16,7 +16,7 @@ to advanced observability features with minimal configuration.
 
 ### Requirements
 
-- Go version 1.23 or newer
+- Go version 1.24 or newer
 - Docker (optional, for running specific examples or tests)
 
 ### Basic Usage
