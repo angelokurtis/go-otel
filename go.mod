@@ -1,3 +1,3 @@
 module github.com/angelokurtis/go-otel
 
-go 1.24.13
+go 1.25.8
