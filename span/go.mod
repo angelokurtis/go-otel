@@ -1,6 +1,6 @@
 module github.com/angelokurtis/go-otel/span
 
-go 1.25.8
+go 1.25.9
 
 require (
 	go.opentelemetry.io/otel v1.43.0

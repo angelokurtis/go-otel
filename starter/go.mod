@@ -1,6 +1,6 @@
 module github.com/angelokurtis/go-otel/starter
 
-go 1.25.8
+go 1.25.9
 
 require (
 	github.com/caarlos0/env/v11 v11.4.0
@@ -9,10 +9,10 @@ require (
 	github.com/gotidy/ptr v1.4.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/stretchr/testify v1.11.1
-	go.opentelemetry.io/contrib/propagators/aws v1.42.0
-	go.opentelemetry.io/contrib/propagators/b3 v1.42.0
-	go.opentelemetry.io/contrib/propagators/jaeger v1.42.0
-	go.opentelemetry.io/contrib/propagators/ot v1.42.0
+	go.opentelemetry.io/contrib/propagators/aws v1.43.0
+	go.opentelemetry.io/contrib/propagators/b3 v1.43.0
+	go.opentelemetry.io/contrib/propagators/jaeger v1.43.0
+	go.opentelemetry.io/contrib/propagators/ot v1.43.0
 	go.opentelemetry.io/otel v1.43.0
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.19.0
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.19.0
