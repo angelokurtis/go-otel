@@ -8,6 +8,7 @@ run_part1() {
   cd ./span/
   rm -rf go.mod go.sum
   go mod init github.com/angelokurtis/go-otel/span
+  go mod edit -go=1.25.0 -toolchain=go1.25.14
   go get go.opentelemetry.io/otel@latest
   go get go.opentelemetry.io/otel/trace@latest
   go mod tidy
@@ -19,6 +20,7 @@ run_part2() {
   cd ./starter/
   rm -rf go.mod go.sum
   go mod init github.com/angelokurtis/go-otel/starter
+  go mod edit -go=1.25.0 -toolchain=go1.25.14
   go get github.com/caarlos0/env/v11@latest
   go get github.com/go-logr/logr@latest
   go get github.com/go-logr/stdr@latest
