@@ -47,6 +47,7 @@ run_part2() {
 export GOTOOLCHAIN=local
 rm -rf go.mod go.sum
 go mod init github.com/angelokurtis/go-otel
+go mod edit -go=1.25.0 -toolchain=go1.25.14
 run_part1 &
 run_part2 &
 
